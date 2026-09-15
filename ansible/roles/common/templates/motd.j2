@@ -1,0 +1,7 @@
+{{ ansible_managed | comment }}
+  Taylor Shift - {{ env_name | default('unknown') }} environment
+  Host   : {{ inventory_hostname }} ({{ ansible_default_ipv4.address | default('n/a') }})
+  Region : {{ aws_region | default('n/a') }}{% if availability_zone is defined %} / {{ availability_zone }}{% endif %}
+
+  This machine is configured by Ansible from the 5HASH repository.
+  Manual changes are overwritten by the next `ansible-playbook site.yml` run.

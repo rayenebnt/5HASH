@@ -1,0 +1,13 @@
+---
+# efs_dns_name is published by Terraform through the dynamic inventory.
+efs_mount_point: /srv/prestashop
+efs_packages:
+  - nfs-common
+
+# Recommended EFS client settings: NFS 4.1, 1 MiB read/write buffers and a hard
+# mount so a transient EFS hiccup blocks I/O instead of returning an error to
+# PHP. `_netdev` keeps the boot sequence from hanging when the network is late.
+efs_mount_options: "nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev"
+efs_mount_owner: root
+efs_mount_group: root
+efs_mount_mode: "0755"

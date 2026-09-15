@@ -1,0 +1,23 @@
+---
+- name: Check the facts published by Terraform are present
+  ansible.builtin.assert:
+    that:
+      - db_host is defined and db_host | length > 0
+      - db_name is defined and db_name | length > 0
+      - db_secret_arn is defined and db_secret_arn | length > 0
+      - aws_region is defined and aws_region | length > 0
+      - shop_host is defined and shop_host | length > 0
+    fail_msg: >-
+      The inventory is incomplete. It is generated from the Terraform state, so run
+      `terraform -chdir=terraform apply` and check `ansible-inventory -i ansible/inventory.yml --graph --vars`.
+    quiet: true
+
+- name: Check the shop credentials come from the vault
+  ansible.builtin.assert:
+    that:
+      - prestashop_admin_email is defined and prestashop_admin_email | length > 0
+      - prestashop_admin_password is defined and prestashop_admin_password | length > 8
+    fail_msg: >-
+      prestashop_admin_email / prestashop_admin_password are missing. They live in the encrypted
+      ansible/group_vars/all/vault.yml, so the playbook must be run with --ask-vault-pass.
+    quiet: true

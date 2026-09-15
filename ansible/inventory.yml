@@ -1,0 +1,16 @@
+---
+# Dynamic inventory: the hosts, their addresses and the facts describing the
+# infrastructure (database endpoint, EFS id, load balancer name, ...) are read
+# straight from the Terraform state through the `ansible` Terraform provider.
+# Nothing is hardcoded here, so `terraform apply` is the only thing needed to
+# add or remove an instance from the inventory.
+#
+#   terraform -chdir=terraform apply
+#   ansible-inventory -i ansible/inventory.yml --graph
+#
+plugin: cloud.terraform.terraform_provider
+
+# Path of the Terraform root module, relative to the directory the command is
+# run from (the repository root). The plugin calls `terraform show -json` there,
+# so it works with the local state as well as with the S3 backend.
+project_path: ./terraform

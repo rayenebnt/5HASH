@@ -1,0 +1,54 @@
+---
+# --- Image -----------------------------------------------------------------
+# Pinned on purpose: an unpinned tag turns "redeploy the same code" into
+# "deploy whatever was published this morning".
+prestashop_image: "prestashop/prestashop:8.2.8-apache"
+prestashop_container_name: prestashop
+prestashop_installer_container_name: prestashop-installer
+
+# --- Paths -----------------------------------------------------------------
+prestashop_data_root: "{{ efs_mount_point | default('/srv/prestashop') }}"
+prestashop_html_dir: "{{ prestashop_data_root }}/html"
+prestashop_sessions_dir: "{{ prestashop_data_root }}/sessions"
+prestashop_config_dir: /etc/prestashop
+prestashop_php_conf_dir: "{{ prestashop_config_dir }}/php"
+
+# Paths as seen from inside the container.
+prestashop_container_html_dir: /var/www/html
+prestashop_container_sessions_dir: /var/lib/php-sessions
+
+# www-data inside the Debian based image.
+prestashop_www_uid: 33
+prestashop_www_gid: 33
+
+# --- Networking ------------------------------------------------------------
+prestashop_http_port: 80
+prestashop_installer_http_port: 8080
+prestashop_health_path: /health.php
+
+# --- Shop ------------------------------------------------------------------
+prestashop_shop_name: "Taylor Shift Ticket Shop"
+prestashop_db_prefix: "ps_"
+prestashop_admin_dir: "admin-taylorshift"
+prestashop_language: "en"
+prestashop_country: "fr"
+prestashop_dev_mode: "0"
+# prestashop_admin_email and prestashop_admin_password are intentionally not
+# defined here: they come from the Ansible Vault (group_vars/all/vault.yml) and
+# the role refuses to run without them.
+
+# --- PHP -------------------------------------------------------------------
+prestashop_php_memory_limit: "512M"
+prestashop_php_upload_max_filesize: "32M"
+prestashop_php_post_max_size: "32M"
+prestashop_php_max_execution_time: "300"
+prestashop_php_session_gc_maxlifetime: "86400"
+
+# --- Runtime ---------------------------------------------------------------
+prestashop_mysql_client_package: default-mysql-client
+prestashop_restart_policy: unless-stopped
+prestashop_log_max_size: "10m"
+prestashop_log_max_file: "3"
+# Bound the installer: a hung installer must fail the deployment, not hang it.
+prestashop_install_retries: 60
+prestashop_install_delay: 15

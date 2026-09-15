@@ -1,0 +1,14 @@
+---
+# Variables shared by every managed host.
+#
+# Nothing about the infrastructure is defined here: the database endpoint, the
+# EFS id, the load balancer name and the instance addresses all come from the
+# Terraform state through the dynamic inventory (see ansible/inventory.yml).
+# Anything written here would be a second source of truth waiting to drift.
+
+ts_timezone: "Europe/Paris"
+
+# Banner rendered at the top of every managed file. Deliberately free of any
+# timestamp: a template must produce the exact same bytes on every run, or the
+# playbook would report a change forever.
+ansible_managed: "Ansible managed - edit in the 5HASH repository, not on the host"

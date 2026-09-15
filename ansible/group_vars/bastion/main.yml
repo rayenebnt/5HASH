@@ -1,0 +1,8 @@
+---
+# The bastion only forwards SSH sessions to the private subnets, so it gets the
+# baseline role with a minimal package set - the same role as the application
+# instances, driven by different variables.
+common_packages:
+  - ca-certificates
+  - curl
+  - unzip

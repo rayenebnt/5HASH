@@ -1,0 +1,54 @@
+---
+- name: Update the apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: "{{ common_apt_cache_valid_time }}"
+  changed_when: false
+
+- name: Install the baseline packages
+  ansible.builtin.apt:
+    name: "{{ common_packages + common_extra_packages }}"
+    state: present
+
+- name: Set the system timezone
+  community.general.timezone:
+    name: "{{ common_timezone }}"
+  notify: Restart cron
+
+- name: Set the hostname to the inventory name
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+  when: common_manage_hostname | bool
+
+- name: Make the hostname resolvable locally
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1\s'
+    line: "127.0.1.1 {{ inventory_hostname }}"
+    state: present
+  when: common_manage_hostname | bool
+
+- name: Create the journald drop-in directory
+  ansible.builtin.file:
+    path: /etc/systemd/journald.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Cap the size of the systemd journal
+  ansible.builtin.template:
+    src: journald.conf.j2
+    dest: /etc/systemd/journald.conf.d/99-taylorshift.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart journald
+
+- name: Publish the machine description in the message of the day
+  ansible.builtin.template:
+    src: motd.j2
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: "0644"

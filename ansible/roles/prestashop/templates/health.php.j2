@@ -1,0 +1,19 @@
+<?php
+/*
+ * {{ ansible_managed }}
+ *
+ * Health endpoint polled by the ALB target group, on purpose a shallow one:
+ * it answers as soon as PHP and Apache are able to serve a request.
+ *
+ * It deliberately does not open a database connection. A slow or failing
+ * database would otherwise mark every instance unhealthy at the same time and
+ * turn a degraded shop into a completely unreachable one, while the recovery
+ * (an RDS failover) needs the instances to stay in rotation.
+ *
+ * The file is identical on every instance: it lives on the shared EFS document
+ * root, so it is rendered once per deployment.
+ */
+header('Content-Type: text/plain; charset=utf-8');
+header('Cache-Control: no-store');
+http_response_code(200);
+echo "ok\n";

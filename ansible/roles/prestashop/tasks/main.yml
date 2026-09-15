@@ -1,0 +1,16 @@
+---
+- name: Check the inventory and the vault provide everything the role needs
+  ansible.builtin.import_tasks: preflight.yml
+  tags: [prestashop, preflight]
+
+- name: Lay out the configuration on the instance
+  ansible.builtin.import_tasks: config.yml
+  tags: [prestashop, config]
+
+- name: Install the shop on the very first deployment
+  ansible.builtin.import_tasks: install.yml
+  tags: [prestashop, install]
+
+- name: Run the shop
+  ansible.builtin.import_tasks: deploy.yml
+  tags: [prestashop, deploy]

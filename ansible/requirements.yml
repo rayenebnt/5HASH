@@ -1,0 +1,25 @@
+---
+# Installed with: ansible-galaxy install -r ansible/requirements.yml
+#
+# Lower bounds only: they document the first version exposing the features the
+# playbooks rely on, while still allowing the team to pick up bug fixes.
+collections:
+  # Dynamic inventory backed by the Terraform state.
+  - name: cloud.terraform
+    version: ">=2.0.0"
+  # docker_container / docker_image_pull used by the prestashop role.
+  - name: community.docker
+    version: ">=3.8.0"
+  # ansible.posix.mount (EFS) and the profile_tasks callback.
+  - name: ansible.posix
+    version: ">=1.5.4"
+  # AWS helpers used for ad-hoc operations documented in the README.
+  - name: amazon.aws
+    version: ">=7.0.0"
+  - name: community.general
+    version: ">=8.0.0"
+
+roles:
+  # Docker Engine installation: a maintained community role rather than 40
+  # lines of apt tasks we would have to keep up to date ourselves.
+  - name: geerlingguy.docker

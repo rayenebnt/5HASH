@@ -1,0 +1,17 @@
+; {{ ansible_managed }}
+; Mounted read-only into /usr/local/etc/php/conf.d/ of the PrestaShop container.
+
+memory_limit = {{ prestashop_php_memory_limit }}
+upload_max_filesize = {{ prestashop_php_upload_max_filesize }}
+post_max_size = {{ prestashop_php_post_max_size }}
+max_execution_time = {{ prestashop_php_max_execution_time }}
+date.timezone = "{{ common_timezone | default('Etc/UTC') }}"
+expose_php = Off
+
+; Sessions live on the shared file system, not on the instance. A customer
+; keeps their cart and their login when the load balancer sends the next
+; request to another instance, and an instance can be replaced at any time.
+session.save_handler = files
+session.save_path = "{{ prestashop_container_sessions_dir }}"
+session.gc_maxlifetime = {{ prestashop_php_session_gc_maxlifetime }}
+session.cookie_httponly = On

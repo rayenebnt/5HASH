@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+# {{ ansible_managed }}
+#
+# Small helper around the shop database. It reads its credentials from
+# {{ prestashop_config_dir }}/db.env, so no password is ever passed as an
+# argument (arguments are world readable in /proc) or written to a shell history.
+#
+#   ts-db installed            -> prints "installed" or "empty"
+#   ts-db query "<SQL>"        -> runs a statement and prints the raw result
+#   ts-db set-domain <host> [scheme]
+#                              -> aligns the shop URL with the load balancer,
+#                                 printing CHANGED only when something moved
+
+set -euo pipefail
+
+ENV_FILE="{{ prestashop_config_dir }}/db.env"
+
+if [ ! -r "${ENV_FILE}" ]; then
+  echo "missing ${ENV_FILE}; run ts-db-credentials first" >&2
+  exit 1
+fi
+
+set -a
+# shellcheck disable=SC1090
+. "${ENV_FILE}"
+set +a
+
+# MYSQL_PWD keeps the password off the command line.
+export MYSQL_PWD="${DB_PASSWD}"
+
+mysql_do() {
+  mysql --host="${DB_SERVER}" --port="${DB_PORT}" --user="${DB_USER}" \
+        --database="${DB_NAME}" --batch --skip-column-names \
+        --connect-timeout=10 -e "$1"
+}
+
+sql_escape() {
+  printf '%s' "$1" | sed "s/'/''/g"
+}
+
+cmd="${1:-}"
+
+case "${cmd}" in
+  installed)
+    count="$(mysql_do "SELECT COUNT(*) FROM information_schema.tables
+                       WHERE table_schema = '$(sql_escape "${DB_NAME}")'
+                         AND table_name  = '$(sql_escape "${DB_PREFIX}shop")'")"
+    if [ "${count}" -ge 1 ]; then echo "installed"; else echo "empty"; fi
+    ;;
+
+  query)
+    mysql_do "${2:?usage: ts-db query \"<SQL>\"}"
+    ;;
+
+  set-domain)
+    host="${2:?usage: ts-db set-domain <host> [scheme]}"
+    scheme="${3:-http}"
+
+    # Only a hostname is ever expected here; refuse anything else rather than
+    # interpolating it into SQL.
+    if ! printf '%s' "${host}" | grep -Eq '^[A-Za-z0-9._-]+$'; then
+      echo "refusing suspicious host: ${host}" >&2
+      exit 2
+    fi
+
+    ssl_enabled=0
+    [ "${scheme}" = "https" ] && ssl_enabled=1
+
+    current="$(mysql_do "SELECT domain FROM ${DB_PREFIX}shop_url WHERE id_shop_url = 1" || true)"
+
+    if [ "${current}" = "${host}" ]; then
+      echo "OK domain already ${host}"
+      exit 0
+    fi
+
+    mysql_do "UPDATE ${DB_PREFIX}shop_url
+                 SET domain = '${host}', domain_ssl = '${host}'
+               WHERE id_shop_url = 1;
+              UPDATE ${DB_PREFIX}configuration
+                 SET value = '${host}'
+               WHERE name IN ('PS_SHOP_DOMAIN', 'PS_SHOP_DOMAIN_SSL');
+              UPDATE ${DB_PREFIX}configuration
+                 SET value = '${ssl_enabled}'
+               WHERE name IN ('PS_SSL_ENABLED', 'PS_SSL_ENABLED_EVERYWHERE');"
+
+    echo "CHANGED domain ${current:-<none>} -> ${host}"
+    ;;
+
+  *)
+    echo "usage: ts-db {installed|query <SQL>|set-domain <host> [scheme]}" >&2
+    exit 64
+    ;;
+esac

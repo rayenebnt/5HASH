@@ -1,0 +1,72 @@
+---
+- name: Install the MySQL client used by the schema checks
+  ansible.builtin.apt:
+    name: "{{ prestashop_mysql_client_package }}"
+    state: present
+
+- name: Create the configuration directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+  loop:
+    - "{{ prestashop_config_dir }}"
+    - "{{ prestashop_php_conf_dir }}"
+
+# The database password never transits through the control node and is never
+# written in the repository: the instance reads it from Secrets Manager with its
+# own IAM role, and the file it writes is only readable by root.
+- name: Install the credentials helper
+  ansible.builtin.template:
+    src: ts-db-credentials.sh.j2
+    dest: /usr/local/bin/ts-db-credentials
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Install the database helper
+  ansible.builtin.template:
+    src: ts-db.sh.j2
+    dest: /usr/local/bin/ts-db
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Fetch the database credentials from Secrets Manager
+  ansible.builtin.command:
+    cmd: /usr/local/bin/ts-db-credentials
+  register: prestashop_credentials
+  changed_when: "'changed' in prestashop_credentials.stdout"
+  notify: Restart PrestaShop
+
+- name: Install the PHP configuration of the shop
+  ansible.builtin.template:
+    src: zz-taylorshift.ini.j2
+    dest: "{{ prestashop_php_conf_dir }}/zz-taylorshift.ini"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart PrestaShop
+
+# Shared storage: created once, seen by every instance. The document root must
+# stay empty until the installer has run - the image only unpacks PrestaShop
+# into a directory it finds empty.
+- name: Create the shared document root
+  ansible.builtin.file:
+    path: "{{ prestashop_html_dir }}"
+    state: directory
+    owner: "{{ prestashop_www_uid }}"
+    group: "{{ prestashop_www_gid }}"
+    mode: "0755"
+  run_once: true
+
+- name: Create the shared PHP session directory
+  ansible.builtin.file:
+    path: "{{ prestashop_sessions_dir }}"
+    state: directory
+    owner: "{{ prestashop_www_uid }}"
+    group: "{{ prestashop_www_gid }}"
+    mode: "0700"
+  run_once: true

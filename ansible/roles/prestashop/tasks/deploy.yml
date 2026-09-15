@@ -1,0 +1,87 @@
+---
+- name: Pull the PrestaShop image
+  community.docker.docker_image_pull:
+    name: "{{ prestashop_image }}"
+    pull: not_present
+
+# Shared document root: written once, served by every instance.
+- name: Publish the load balancer health endpoint
+  ansible.builtin.template:
+    src: health.php.j2
+    dest: "{{ prestashop_html_dir }}{{ prestashop_health_path }}"
+    owner: "{{ prestashop_www_uid }}"
+    group: "{{ prestashop_www_gid }}"
+    mode: "0644"
+  run_once: true
+
+- name: Run the PrestaShop container
+  community.docker.docker_container:
+    name: "{{ prestashop_container_name }}"
+    image: "{{ prestashop_image }}"
+    state: started
+    pull: missing
+    restart_policy: "{{ prestashop_restart_policy }}"
+    published_ports:
+      - "{{ prestashop_http_port }}:80"
+    env_file: "{{ prestashop_config_dir }}/db.env"
+    env: "{{ prestashop_runtime_env }}"
+    volumes:
+      - "{{ prestashop_html_dir }}:{{ prestashop_container_html_dir }}"
+      - "{{ prestashop_sessions_dir }}:{{ prestashop_container_sessions_dir }}"
+      - "{{ prestashop_php_conf_dir }}/zz-taylorshift.ini:/usr/local/etc/php/conf.d/zz-taylorshift.ini:ro"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          php -r "exit(@file_get_contents('http://127.0.0.1{{ prestashop_health_path }}') === false ? 1 : 0);"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    log_driver: json-file
+    log_options:
+      max-size: "{{ prestashop_log_max_size }}"
+      max-file: "{{ prestashop_log_max_file }}"
+  register: prestashop_container
+
+- name: Wait for the container to accept connections
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: "{{ prestashop_http_port }}"
+    timeout: 180
+
+# Same check as the one the load balancer performs: if this fails, the instance
+# would silently stay out of rotation.
+- name: Check the health endpoint the target group polls
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ prestashop_http_port }}{{ prestashop_health_path }}"
+    return_content: true
+    status_code: 200
+    follow_redirects: none
+  register: prestashop_health
+  until: prestashop_health is succeeded and "ok" in (prestashop_health.content | default(""))
+  retries: 30
+  delay: 10
+  changed_when: false
+
+- name: Check the shop answers on the front office
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ prestashop_http_port }}/"
+    status_code: [200, 301, 302]
+    # A redirect to the canonical shop name is a healthy answer here.
+    follow_redirects: none
+    timeout: 60
+  register: prestashop_front
+  until: prestashop_front is succeeded
+  retries: 10
+  delay: 15
+  changed_when: false
+
+- name: Summarise the deployment
+  ansible.builtin.debug:
+    msg:
+      - "Shop        : {{ shop_url | default('http://' ~ shop_host) }}"
+      - "Back office : {{ shop_url | default('http://' ~ shop_host) }}/{{ prestashop_admin_dir }}"
+      - "Instances   : {{ groups['prestashop'] | length }} behind {{ alb_dns_name | default('the load balancer') }}"
+      - "Database    : {{ db_host }}/{{ db_name }}"
+  run_once: true

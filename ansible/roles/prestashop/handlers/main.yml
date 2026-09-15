@@ -1,0 +1,22 @@
+---
+# Restarting through the CLI keeps the container specification in one place
+# (tasks/deploy.yml) and makes the handler a no-op on the first run, when the
+# container does not exist yet and is about to be created with the new
+# configuration anyway.
+- name: Restart PrestaShop
+  ansible.builtin.command:
+    cmd: "docker restart {{ prestashop_container_name }}"
+  register: prestashop_restart
+  changed_when: prestashop_restart.rc == 0
+  failed_when:
+    - prestashop_restart.rc != 0
+    - "'No such container' not in prestashop_restart.stderr"
+  listen: Restart PrestaShop
+
+# PrestaShop caches its configuration - including the shop URL - in var/cache.
+- name: Clear the PrestaShop cache
+  ansible.builtin.file:
+    path: "{{ prestashop_html_dir }}/var/cache"
+    state: absent
+  run_once: true
+  listen: Clear the PrestaShop cache

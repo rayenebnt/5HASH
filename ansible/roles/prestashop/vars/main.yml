@@ -1,0 +1,36 @@
+---
+# Environment of the generic PrestaShop image (https://hub.docker.com/r/prestashop/prestashop).
+# Values must all be strings: the docker_container module refuses ambiguous
+# types, and a type change would recreate the container on every run.
+#
+# The database credentials are NOT here: they are read from
+# {{ prestashop_config_dir }}/db.env, which the instance writes itself from
+# Secrets Manager.
+
+# Used once, by the throw-away installer container.
+prestashop_install_env:
+  PS_INSTALL_AUTO: "1"
+  PS_ERASE_DB: "0"
+  PS_DEV_MODE: "{{ prestashop_dev_mode }}"
+  PS_DOMAIN: "{{ shop_host }}"
+  PS_HANDLE_DYNAMIC_DOMAIN: "0"
+  PS_ENABLE_SSL: "{{ '1' if (shop_scheme | default('http')) == 'https' else '0' }}"
+  PS_FOLDER_ADMIN: "{{ prestashop_admin_dir }}"
+  PS_FOLDER_INSTALL: "install"
+  PS_SHOP_NAME: "{{ prestashop_shop_name }}"
+  PS_LANGUAGE: "{{ prestashop_language }}"
+  PS_COUNTRY: "{{ prestashop_country }}"
+  ADMIN_MAIL: "{{ prestashop_admin_email }}"
+  ADMIN_PASSWD: "{{ prestashop_admin_password }}"
+
+# Used by the containers that actually serve the shop. The installer is off and
+# the administrator credentials are absent, so `docker inspect` on a running
+# instance exposes no account secret.
+prestashop_runtime_env:
+  PS_INSTALL_AUTO: "0"
+  PS_ERASE_DB: "0"
+  PS_DEV_MODE: "{{ prestashop_dev_mode }}"
+  PS_DOMAIN: "{{ shop_host }}"
+  PS_HANDLE_DYNAMIC_DOMAIN: "0"
+  PS_ENABLE_SSL: "{{ '1' if (shop_scheme | default('http')) == 'https' else '0' }}"
+  PS_FOLDER_ADMIN: "{{ prestashop_admin_dir }}"

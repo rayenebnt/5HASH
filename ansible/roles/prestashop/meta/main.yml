@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  role_name: prestashop
+  author: 5HASH agency
+  description: >-
+    Deploys the generic PrestaShop image from Docker Hub against a managed MySQL
+    database and a shared EFS document root.
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+  galaxy_tags:
+    - prestashop
+    - docker
+    - ecommerce
+
+dependencies: []

@@ -1,0 +1,22 @@
+---
+# Application settings. Secrets are pulled from the encrypted vault next door
+# (group_vars/all/vault.yml); infrastructure facts come from Terraform.
+
+prestashop_shop_name: "Taylor Shift Ticket Shop"
+prestashop_language: "en"
+prestashop_country: "fr"
+
+# Published by Terraform so the `admin_url` output and the deployed shop can
+# never disagree.
+prestashop_admin_dir: "{{ shop_admin_dir | default('admin-taylorshift') }}"
+
+# Indirection on purpose: the role reads prestashop_*, the vault only ever
+# defines vault_* names, which makes an accidentally unencrypted value obvious
+# in a diff.
+prestashop_admin_email: "{{ vault_prestashop_admin_email }}"
+prestashop_admin_password: "{{ vault_prestashop_admin_password }}"
+
+# Ticket sales generate long PHP requests (payment callbacks, cart updates):
+# give the container enough headroom.
+prestashop_php_memory_limit: "512M"
+prestashop_php_max_execution_time: "300"

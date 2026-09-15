@@ -1,0 +1,107 @@
+---
+# The schema and the shop itself are created exactly once. `run_once` is what
+# makes that safe with several instances: the other hosts of the play wait for
+# this block instead of racing to install the same database.
+
+- name: Look for an existing PrestaShop schema
+  ansible.builtin.command:
+    cmd: /usr/local/bin/ts-db installed
+  register: prestashop_schema
+  changed_when: false
+  run_once: true
+
+- name: Install the shop on an empty database
+  when: prestashop_schema.stdout == "empty"
+  run_once: true
+  block:
+    - name: Report the installation is about to start
+      ansible.builtin.debug:
+        msg: >-
+          Empty database detected: running the PrestaShop installer once.
+          This takes a few minutes; the other instances are waiting for it.
+
+    - name: Install the shop and wait for the installer to finish
+      block:
+        # A dedicated, throw-away container: the container that ends up serving
+        # the shop is always created with the installer disabled, so a second
+        # run of the playbook has nothing to change.
+        - name: Start the one-shot installer container
+          community.docker.docker_container:
+            name: "{{ prestashop_installer_container_name }}"
+            image: "{{ prestashop_image }}"
+            state: started
+            pull: missing
+            restart_policy: "no"
+            published_ports:
+              - "127.0.0.1:{{ prestashop_installer_http_port }}:80"
+            env_file: "{{ prestashop_config_dir }}/db.env"
+            env: "{{ prestashop_install_env }}"
+            volumes:
+              - "{{ prestashop_html_dir }}:{{ prestashop_container_html_dir }}"
+          # The environment carries the back-office password.
+          no_log: true
+
+        - name: Wait for the PrestaShop tables
+          ansible.builtin.command:
+            cmd: /usr/local/bin/ts-db installed
+          register: prestashop_install_state
+          until: prestashop_install_state.stdout == "installed"
+          retries: "{{ prestashop_install_retries }}"
+          delay: "{{ prestashop_install_delay }}"
+          changed_when: false
+
+        - name: Wait for the installer container to answer over HTTP
+          ansible.builtin.uri:
+            url: "http://127.0.0.1:{{ prestashop_installer_http_port }}/"
+            status_code: [200, 301, 302]
+            # The shop redirects to its canonical (load balancer) name; following
+            # that redirect would test the load balancer, not this container.
+            follow_redirects: none
+            timeout: 30
+          register: prestashop_install_http
+          until: prestashop_install_http is succeeded
+          retries: 30
+          delay: 10
+          changed_when: false
+      rescue:
+        - name: Collect the installer logs
+          ansible.builtin.command:
+            cmd: "docker logs --tail 80 {{ prestashop_installer_container_name }}"
+          register: prestashop_installer_logs
+          changed_when: false
+          failed_when: false
+
+        - name: Report the installation failure
+          ansible.builtin.fail:
+            msg: |-
+              The PrestaShop installation failed or did not finish in time.
+              Usual suspects: the database security group, the Secrets Manager
+              value, or an image tag that does not exist.
+              Last lines of the installer container log:
+              {{ prestashop_installer_logs.stdout | default('(no log available)') }}
+              {{ prestashop_installer_logs.stderr | default('') }}
+
+# Always reconciled, so a failed or interrupted installation never leaves a
+# second container bound to the shared document root.
+- name: Remove the installer container
+  community.docker.docker_container:
+    name: "{{ prestashop_installer_container_name }}"
+    state: absent
+  run_once: true
+
+- name: Remove the PrestaShop installation directory
+  ansible.builtin.file:
+    path: "{{ prestashop_html_dir }}/install"
+    state: absent
+  run_once: true
+
+# The shop stores its own URL in the database. Keeping it in line with the load
+# balancer is what makes the stack redeployable: a new ALB means a new DNS name,
+# and without this the shop would keep redirecting to the old one.
+- name: Point the shop at the current load balancer
+  ansible.builtin.command:
+    cmd: "/usr/local/bin/ts-db set-domain {{ shop_host }} {{ shop_scheme | default('http') }}"
+  register: prestashop_domain
+  changed_when: "'CHANGED' in prestashop_domain.stdout"
+  run_once: true
+  notify: Clear the PrestaShop cache

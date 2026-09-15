@@ -1,0 +1,38 @@
+---
+- name: Check that the file system was published by Terraform
+  ansible.builtin.assert:
+    that:
+      - efs_dns_name is defined
+      - efs_dns_name | length > 0
+    fail_msg: >-
+      efs_dns_name is missing from the inventory. Run `terraform -chdir=terraform apply`
+      first, then `ansible-inventory -i ansible/inventory.yml --graph --vars` to check.
+    quiet: true
+
+- name: Install the NFS client
+  ansible.builtin.apt:
+    name: "{{ efs_packages }}"
+    state: present
+
+- name: Create the mount point
+  ansible.builtin.file:
+    path: "{{ efs_mount_point }}"
+    state: directory
+    owner: "{{ efs_mount_owner }}"
+    group: "{{ efs_mount_group }}"
+    mode: "{{ efs_mount_mode }}"
+
+# `state: mounted` writes the fstab entry *and* mounts it now, so the file
+# system also comes back after a reboot or an instance replacement.
+- name: Mount the shared file system
+  ansible.posix.mount:
+    path: "{{ efs_mount_point }}"
+    src: "{{ efs_dns_name }}:/"
+    fstype: nfs4
+    opts: "{{ efs_mount_options }}"
+    state: mounted
+
+- name: Verify the mount is live
+  ansible.builtin.command:
+    cmd: "mountpoint -q {{ efs_mount_point }}"
+  changed_when: false

@@ -1,0 +1,54 @@
+---
+# Configures everything Terraform provisioned and deploys the shop.
+#
+#   ansible-playbook -i ansible/inventory.yml ansible/site.yml --ask-vault-pass
+#
+# The playbook is idempotent: a second run converges to the same state and
+# reports no change.
+
+- name: Bastion host
+  hosts: bastion
+  become: true
+  gather_facts: false
+  pre_tasks:
+    # Instances are usually still booting when `terraform apply` returns, and
+    # the application instances are only reachable once this host answers.
+    - name: Wait for SSH to answer
+      ansible.builtin.wait_for_connection:
+        timeout: 600
+        sleep: 5
+      tags: [always]
+
+    - name: Gather facts
+      ansible.builtin.setup:
+      tags: [always]
+  roles:
+    - role: common
+      tags: [common, bastion]
+
+- name: PrestaShop application tier
+  hosts: prestashop
+  become: true
+  gather_facts: false
+  # Fail fast: a half-configured fleet behind the load balancer is worse than
+  # an aborted deployment.
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Wait for SSH to answer through the bastion
+      ansible.builtin.wait_for_connection:
+        timeout: 600
+        sleep: 5
+      tags: [always]
+
+    - name: Gather facts
+      ansible.builtin.setup:
+      tags: [always]
+  roles:
+    - role: common
+      tags: [common]
+    - role: geerlingguy.docker
+      tags: [docker]
+    - role: efs
+      tags: [efs, storage]
+    - role: prestashop
+      tags: [prestashop, app]

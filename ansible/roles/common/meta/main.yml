@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  role_name: common
+  author: 5HASH agency
+  description: Baseline configuration shared by every Taylor Shift instance.
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+  galaxy_tags:
+    - baseline
+    - ubuntu
+
+dependencies: []

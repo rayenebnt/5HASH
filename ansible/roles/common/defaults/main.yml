@@ -1,0 +1,26 @@
+---
+# Packages every host needs, whatever its role:
+#   awscli + jq  -> read the database credentials from Secrets Manager
+#   python3-requests -> required by the community.docker modules
+common_packages:
+  - ca-certificates
+  - curl
+  - unzip
+  - jq
+  - awscli
+  - python3-requests
+
+common_extra_packages: []
+
+common_apt_cache_valid_time: 3600
+
+# Hostname handling: instances are named after their inventory name, which is
+# the Terraform resource name, so logs and prompts are traceable.
+common_manage_hostname: true
+
+# Keep the journal bounded: an instance filling its root volume with logs is an
+# instance that stops serving.
+common_journald_max_use: 500M
+common_journald_max_file_size: 50M
+
+common_timezone: "{{ ts_timezone | default('Etc/UTC') }}"

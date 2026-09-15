@@ -1,0 +1,15 @@
+# Example of the file scripts/bootstrap.sh writes to terraform/backend.tf.
+# The bucket name is account specific, so the generated file is git-ignored.
+#
+#   Terraform >= 1.10 : `use_lockfile = true`  (state lock held as an S3 object)
+#   Terraform <  1.10 : `dynamodb_table = "taylorshift-tfstate-locks"`
+#
+terraform {
+  backend "s3" {
+    bucket       = "taylorshift-tfstate-1a2b3c4d"
+    key          = "dev/terraform.tfstate"
+    region       = "eu-west-3"
+    encrypt      = true
+    use_lockfile = true
+  }
+}
