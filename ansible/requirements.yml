@@ -6,7 +6,7 @@
 collections:
   # Dynamic inventory backed by the Terraform state.
   - name: cloud.terraform
-    version: ">=2.0.0"
+    version: ">=4.0.0"
   # docker_container / docker_image_pull used by the prestashop role.
   - name: community.docker
     version: ">=3.8.0"
@@ -22,4 +22,9 @@ collections:
 roles:
   # Docker Engine installation: a maintained community role rather than 40
   # lines of apt tasks we would have to keep up to date ourselves.
+  #
+  # Deliberately not pinned: a pinned version that has been removed from Galaxy
+  # breaks `ansible-galaxy install` for everyone. Pin it (`version: "x.y.z"`)
+  # once the team has verified a release, which is what a production repository
+  # should do.
   - name: geerlingguy.docker

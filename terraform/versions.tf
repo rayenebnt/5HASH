@@ -26,7 +26,7 @@ terraform {
     # back by the cloud.terraform.terraform_provider inventory plugin.
     ansible = {
       source  = "ansible/ansible"
-      version = "~> 1.3"
+      version = "~> 1.5"
     }
   }
 }

@@ -8,10 +8,17 @@
     cmd: /usr/local/bin/ts-db installed
   register: prestashop_schema
   changed_when: false
+  # Read-only, so it also runs under --check and gives the dry run something
+  # real to reason about.
+  check_mode: false
   run_once: true
 
 - name: Install the shop on an empty database
-  when: prestashop_schema.stdout == "empty"
+  # A dry run reports the installation instead of waiting for a container it
+  # never started.
+  when:
+    - prestashop_schema.stdout == "empty"
+    - not ansible_check_mode
   run_once: true
   block:
     - name: Report the installation is about to start
@@ -96,6 +103,6 @@
   ansible.builtin.command:
     cmd: "/usr/local/bin/ts-db set-domain {{ shop_host }} {{ shop_scheme | default('http') }}"
   register: prestashop_domain
-  changed_when: "'CHANGED' in prestashop_domain.stdout"
+  changed_when: "'CHANGED' in (prestashop_domain.stdout | default(''))"
   run_once: true
   notify: Clear the PrestaShop cache
