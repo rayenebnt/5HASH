@@ -35,8 +35,11 @@ module "security" {
   tags = { Component = "security" }
 }
 
+# The shared document root. Without it every instance keeps its own copy of the
+# pictures and the sessions, which only holds for a single-instance environment.
 module "storage" {
   source = "./modules/storage"
+  count  = var.enable_shared_storage ? 1 : 0
 
   name_prefix        = local.name_prefix
   subnet_ids         = module.network.private_app_subnet_ids
@@ -89,7 +92,7 @@ module "compute" {
   bastion_security_group_ids = [module.security.bastion_security_group_id]
 
   db_secret_arn       = module.database.secret_arn
-  efs_file_system_arn = module.storage.arn
+  efs_file_system_arn = one(module.storage[*].arn)
   detailed_monitoring = local.env.detailed_monitoring
 
   tags = { Component = "compute" }

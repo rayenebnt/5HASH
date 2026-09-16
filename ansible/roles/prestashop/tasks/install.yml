@@ -89,12 +89,6 @@
     state: absent
   run_once: true
 
-- name: Remove the PrestaShop installation directory
-  ansible.builtin.file:
-    path: "{{ prestashop_html_dir }}/install"
-    state: absent
-  run_once: true
-
 # The shop stores its own URL in the database. Keeping it in line with the load
 # balancer is what makes the stack redeployable: a new ALB means a new DNS name,
 # and without this the shop would keep redirecting to the old one.

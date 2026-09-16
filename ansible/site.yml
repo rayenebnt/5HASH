@@ -48,7 +48,11 @@
       tags: [common]
     - role: geerlingguy.docker
       tags: [docker]
+    # Terraform publishes shared_storage=false for environments that keep the
+    # document root on the instance (single instance, or a local emulator with
+    # no NFS data plane).
     - role: efs
       tags: [efs, storage]
+      when: shared_storage | default('true') | bool
     - role: prestashop
       tags: [prestashop, app]

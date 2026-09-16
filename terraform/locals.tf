@@ -6,6 +6,9 @@
 locals {
   name_prefix = "${var.project_name}-${var.environment}"
 
+  # Every AWS call goes to a local emulator instead of the real API.
+  emulated = var.aws_endpoint_url != ""
+
   env_defaults = {
     dev = {
       app_instance_count      = 1
@@ -80,8 +83,14 @@ locals {
   admin_ssh_cidrs = length(var.admin_ssh_cidrs) > 0 ? var.admin_ssh_cidrs : ["${chomp(data.http.my_ip.response_body)}/32"]
 
   enable_https = var.certificate_arn != ""
-  ami_id       = var.app_ami_id != "" ? var.app_ami_id : data.aws_ami.ubuntu.id
 
-  shop_host = var.domain_name != "" ? var.domain_name : module.loadbalancer.dns_name
-  shop_url  = "${local.enable_https ? "https" : "http"}://${local.shop_host}"
+  # The AMI lookup is skipped entirely when an image is pinned, so the stack
+  # also applies where Canonical's catalogue is not published.
+  ami_id = var.app_ami_id != "" ? var.app_ami_id : one(data.aws_ami.ubuntu[*].id)
+
+  shop_host = coalesce(
+    var.domain_name != "" ? var.domain_name : null,
+    var.shop_endpoint_source == "alb" ? module.loadbalancer.dns_name : module.compute.app_private_ips[0],
+  )
+  shop_url = "${local.enable_https ? "https" : "http"}://${local.shop_host}"
 }

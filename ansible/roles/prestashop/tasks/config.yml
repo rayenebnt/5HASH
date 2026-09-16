@@ -50,23 +50,37 @@
     mode: "0644"
   notify: Restart PrestaShop
 
-# Shared storage: created once, seen by every instance. The document root must
-# stay empty until the installer has run - the image only unpacks PrestaShop
-# into a directory it finds empty.
-- name: Create the shared document root
+# The document root must stay empty until the installer has run: the image only
+# unpacks PrestaShop into a directory it finds empty.
+#
+# On shared storage one instance creates the directories for everyone; without
+# it, each instance owns its copy - hence the two tasks rather than a templated
+# run_once, which would silently skip the other hosts.
+- name: Create the shared document root and session directory
   ansible.builtin.file:
-    path: "{{ prestashop_html_dir }}"
+    path: "{{ item.path }}"
     state: directory
     owner: "{{ prestashop_www_uid }}"
     group: "{{ prestashop_www_gid }}"
-    mode: "0755"
+    mode: "{{ item.mode }}"
+  loop:
+    - {path: "{{ prestashop_html_dir }}", mode: "0755"}
+    - {path: "{{ prestashop_sessions_dir }}", mode: "0700"}
+  loop_control:
+    label: "{{ item.path }}"
   run_once: true
+  when: prestashop_shared_storage | bool
 
-- name: Create the shared PHP session directory
+- name: Create the local document root and session directory
   ansible.builtin.file:
-    path: "{{ prestashop_sessions_dir }}"
+    path: "{{ item.path }}"
     state: directory
     owner: "{{ prestashop_www_uid }}"
     group: "{{ prestashop_www_gid }}"
-    mode: "0700"
-  run_once: true
+    mode: "{{ item.mode }}"
+  loop:
+    - {path: "{{ prestashop_html_dir }}", mode: "0755"}
+    - {path: "{{ prestashop_sessions_dir }}", mode: "0700"}
+  loop_control:
+    label: "{{ item.path }}"
+  when: not (prestashop_shared_storage | bool)

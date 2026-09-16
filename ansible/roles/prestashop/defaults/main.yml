@@ -6,6 +6,11 @@ prestashop_image: "prestashop/prestashop:8.2.8-apache"
 prestashop_container_name: prestashop
 prestashop_installer_container_name: prestashop-installer
 
+# Published by Terraform through the inventory. When false, every instance
+# keeps its own document root and PHP sessions, which only holds for a single
+# instance or behind sticky sessions.
+prestashop_shared_storage: "{{ shared_storage | default('true') | bool }}"
+
 # --- Paths -----------------------------------------------------------------
 prestashop_data_root: "{{ efs_mount_point | default('/srv/prestashop') }}"
 prestashop_html_dir: "{{ prestashop_data_root }}/html"

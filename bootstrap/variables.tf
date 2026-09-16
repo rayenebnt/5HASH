@@ -4,6 +4,12 @@ variable "project_name" {
   default     = "taylorshift"
 }
 
+variable "aws_endpoint_url" {
+  description = "Base URL of a local AWS emulator (Floci, LocalStack). Leave empty to target real AWS."
+  type        = string
+  default     = ""
+}
+
 variable "aws_region" {
   description = "AWS region that hosts the Terraform state bucket and the DynamoDB lock table."
   type        = string

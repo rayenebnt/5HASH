@@ -34,15 +34,19 @@ data "aws_iam_policy_document" "app" {
     resources = [var.db_secret_arn]
   }
 
-  statement {
-    sid    = "MountSharedFileSystem"
-    effect = "Allow"
-    actions = [
-      "elasticfilesystem:ClientMount",
-      "elasticfilesystem:ClientWrite",
-      "elasticfilesystem:DescribeMountTargets",
-    ]
-    resources = [var.efs_file_system_arn]
+  dynamic "statement" {
+    for_each = var.efs_file_system_arn != "" ? [var.efs_file_system_arn] : []
+
+    content {
+      sid    = "MountSharedFileSystem"
+      effect = "Allow"
+      actions = [
+        "elasticfilesystem:ClientMount",
+        "elasticfilesystem:ClientWrite",
+        "elasticfilesystem:DescribeMountTargets",
+      ]
+      resources = [statement.value]
+    }
   }
 }
 

@@ -28,6 +28,12 @@ variable "owner" {
   default     = "5hash-agency"
 }
 
+variable "aws_endpoint_url" {
+  description = "Base URL of a local AWS emulator (Floci, LocalStack), for example http://localhost:4566. Leave empty to target real AWS. See the emulator section of the README for what the emulator can and cannot run."
+  type        = string
+  default     = ""
+}
+
 variable "aws_region" {
   description = "AWS region hosting the stack."
   type        = string
@@ -63,6 +69,23 @@ variable "http_ingress_cidrs" {
   description = "CIDR blocks allowed to reach the shop through the load balancer."
   type        = list(string)
   default     = ["0.0.0.0/0"]
+}
+
+variable "enable_shared_storage" {
+  description = "Mount the EFS file system as the shared PrestaShop document root. Disable it only for a single-instance environment (or against an emulator, which has no NFS data plane): every instance then keeps its own copy of the pictures and sessions."
+  type        = bool
+  default     = true
+}
+
+variable "shop_endpoint_source" {
+  description = "Address the shop is published on: alb (the load balancer, default) or instance (the first application instance, for environments without a traffic-serving load balancer)."
+  type        = string
+  default     = "alb"
+
+  validation {
+    condition     = contains(["alb", "instance"], var.shop_endpoint_source)
+    error_message = "shop_endpoint_source must be either alb or instance."
+  }
 }
 
 # --- Access ----------------------------------------------------------------

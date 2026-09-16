@@ -73,8 +73,9 @@ variable "db_secret_arn" {
 }
 
 variable "efs_file_system_arn" {
-  description = "ARN of the shared EFS file system the instances are allowed to mount."
+  description = "ARN of the shared EFS file system the instances are allowed to mount. Empty when the environment runs without shared storage."
   type        = string
+  default     = ""
 }
 
 variable "detailed_monitoring" {

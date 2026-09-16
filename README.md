@@ -109,6 +109,36 @@ terraform -chdir=terraform apply -var-file=environments/prod.tfvars
 Sizing lives in `terraform/locals.tf` (`env_defaults`); anything can still be
 overridden per environment in `terraform/environments/*.tfvars`.
 
+### Running against a local emulator (Floci / LocalStack)
+
+The same code applies against a local AWS emulator, with no account and no cost:
+
+```sh
+floci start && eval $(floci env)                 # exports AWS_ENDPOINT_URL
+./scripts/bootstrap-backend.sh dev               # optional: state in the emulator
+terraform -chdir=terraform init
+terraform -chdir=terraform apply -var-file=environments/floci.tfvars
+```
+
+`environments/floci.tfvars` sets the endpoint, pins the AMI to the emulator's
+catalogue and turns off the two things the emulator cannot back. What it is
+worth knowing before relying on it:
+
+| | On the emulator |
+|---|---|
+| VPC, subnets, security groups, IAM, Secrets Manager, CloudWatch | provisioned, usable |
+| EC2 | **real containers** — SSH, IMDS, instance role: Ansible configures them normally |
+| RDS MySQL | **real `mysql:8.0` container** — the schema check and the shop really connect |
+| EFS | metadata only, no NFS data plane: mounting fails, so `enable_shared_storage = false` |
+| Load balancer | listeners and targets are stored but forward no packets: the shop is published on the instance, `shop_endpoint_source = "instance"` |
+| Docker inside an instance | not possible — instances are unprivileged containers |
+
+That last line is why **real AWS is the supported target**: the brief requires the
+PrestaShop image from Docker Hub to run on an EC2 instance, and only a real
+instance can run a container engine. The emulator is the right tool to rehearse
+the Terraform run, the inventory and the database wiring for free; the shop
+itself needs the real thing.
+
 ---
 
 ## 4. How requests reach the shop, and what happens when traffic grows
@@ -179,6 +209,9 @@ over to its standby in 60–120 s.
 
 Other decisions worth knowing:
 
+- **The emulator was evaluated, not assumed**: EC2 and RDS are real containers
+  there, EFS and the load balancer are not, and no instance can run Docker — see
+  the table above. The architecture targets real AWS for that reason.
 - **Instances have no public address**; outbound traffic goes through NAT
   gateways (one per AZ in production), and S3 traffic through a free gateway
   endpoint.

@@ -135,6 +135,26 @@ instance.
 
 ---
 
+## Why real AWS, not the emulator
+
+The course tooling (Floci) provisions a lot of this stack for free — so we
+checked it rather than assumed it:
+
+| On the emulator | |
+|---|---|
+| EC2, RDS MySQL | **real containers** — Ansible configures them, the shop's SQL really runs |
+| VPC, IAM, Secrets Manager, CloudWatch | provisioned and usable |
+| EFS | metadata only — no NFS data plane, mounting fails |
+| Load balancer | listeners and targets stored, **no packet forwarded** |
+| Docker **inside** an instance | impossible — instances are unprivileged containers |
+
+The brief requires the PrestaShop image from Docker Hub to run on an EC2
+instance. Only a real instance runs a container engine, so the shop targets real
+AWS — `environments/floci.tfvars` still applies the whole stack locally to
+rehearse Terraform, the inventory and the database wiring at zero cost.
+
+---
+
 ## Demo
 
 1. `./scripts/bootstrap-backend.sh dev` — state backend

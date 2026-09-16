@@ -4,16 +4,6 @@
     name: "{{ prestashop_image }}"
     pull: not_present
 
-# Shared document root: written once, served by every instance.
-- name: Publish the load balancer health endpoint
-  ansible.builtin.template:
-    src: health.php.j2
-    dest: "{{ prestashop_html_dir }}{{ prestashop_health_path }}"
-    owner: "{{ prestashop_www_uid }}"
-    group: "{{ prestashop_www_gid }}"
-    mode: "0644"
-  run_once: true
-
 - name: Run the PrestaShop container
   community.docker.docker_container:
     name: "{{ prestashop_container_name }}"
@@ -44,11 +34,38 @@
       max-file: "{{ prestashop_log_max_file }}"
   register: prestashop_container
 
+# The image unpacks PrestaShop into an empty document root on first start, so
+# everything below waits for the container to serve before touching those files.
 - name: Wait for the container to accept connections
   ansible.builtin.wait_for:
     host: 127.0.0.1
     port: "{{ prestashop_http_port }}"
-    timeout: 180
+    timeout: 300
+
+- name: Publish the load balancer health endpoint on the shared document root
+  ansible.builtin.template:
+    src: health.php.j2
+    dest: "{{ prestashop_html_dir }}{{ prestashop_health_path }}"
+    owner: "{{ prestashop_www_uid }}"
+    group: "{{ prestashop_www_gid }}"
+    mode: "0644"
+  run_once: true
+  when: prestashop_shared_storage | bool
+
+- name: Publish the load balancer health endpoint on this instance
+  ansible.builtin.template:
+    src: health.php.j2
+    dest: "{{ prestashop_html_dir }}{{ prestashop_health_path }}"
+    owner: "{{ prestashop_www_uid }}"
+    group: "{{ prestashop_www_gid }}"
+    mode: "0644"
+  when: not (prestashop_shared_storage | bool)
+
+# PrestaShop refuses to run with its installer still present.
+- name: Remove the installation directory from the document root
+  ansible.builtin.file:
+    path: "{{ prestashop_html_dir }}/install"
+    state: absent
 
 # Same check as the one the load balancer performs: if this fails, the instance
 # would silently stay out of rotation.
@@ -84,4 +101,5 @@
       - "Back office : {{ shop_url | default('http://' ~ shop_host) }}/{{ prestashop_admin_dir }}"
       - "Instances   : {{ groups['prestashop'] | length }} behind {{ alb_dns_name | default('the load balancer') }}"
       - "Database    : {{ db_host }}/{{ db_name }}"
+      - "Storage     : {{ 'shared (EFS)' if prestashop_shared_storage | bool else 'local to each instance' }}"
   run_once: true

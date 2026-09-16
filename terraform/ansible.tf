@@ -36,8 +36,9 @@ locals {
     db_secret_arn = module.database.secret_arn
     db_multi_az   = tostring(module.database.multi_az)
 
-    efs_file_system_id = module.storage.file_system_id
-    efs_dns_name       = module.storage.dns_name
+    shared_storage     = tostring(var.enable_shared_storage)
+    efs_file_system_id = one(module.storage[*].file_system_id) != null ? one(module.storage[*].file_system_id) : ""
+    efs_dns_name       = one(module.storage[*].dns_name) != null ? one(module.storage[*].dns_name) : ""
 
     alb_dns_name       = module.loadbalancer.dns_name
     alb_target_group   = module.loadbalancer.target_group_arn

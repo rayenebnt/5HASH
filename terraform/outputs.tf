@@ -39,8 +39,8 @@ output "database_secret_name" {
 }
 
 output "efs_file_system_id" {
-  description = "Shared EFS file system holding the PrestaShop document root."
-  value       = module.storage.file_system_id
+  description = "Shared EFS file system holding the PrestaShop document root, or null when the environment runs without shared storage."
+  value       = one(module.storage[*].file_system_id)
 }
 
 output "ssh_private_key_path" {

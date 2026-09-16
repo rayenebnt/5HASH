@@ -12,6 +12,8 @@ data "aws_caller_identity" "current" {}
 # Latest Ubuntu 24.04 LTS published by Canonical (owner ID 099720109477),
 # resolved at apply time instead of being hardcoded per region.
 data "aws_ami" "ubuntu" {
+  count = var.app_ami_id == "" ? 1 : 0
+
   most_recent = true
   owners      = ["099720109477"]
 
