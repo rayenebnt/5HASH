@@ -50,7 +50,9 @@ prestashop_php_max_execution_time: "300"
 prestashop_php_session_gc_maxlifetime: "86400"
 
 # --- Runtime ---------------------------------------------------------------
-prestashop_mysql_client_package: default-mysql-client
+# In `main` on Ubuntu 22.04 and 24.04, and the smallest package shipping the
+# `mysql` client; `default-mysql-client` lives in `universe`.
+prestashop_mysql_client_package: mysql-client-core-8.0
 prestashop_restart_policy: unless-stopped
 prestashop_log_max_size: "10m"
 prestashop_log_max_file: "3"

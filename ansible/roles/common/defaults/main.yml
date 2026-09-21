@@ -1,13 +1,17 @@
 ---
-# Packages every host needs, whatever its role:
-#   awscli + jq  -> read the database credentials from Secrets Manager
+# Packages every host needs, whatever its role. Ubuntu 24.04 dropped the
+# `awscli` package from its archive, and the official v2 installer would pull
+# 60 MB onto every instance: boto3 reads Secrets Manager just as well and
+# ships in `main`.
+#   python3-boto3    -> reads the database credentials from Secrets Manager
 #   python3-requests -> required by the community.docker modules
+#   jq               -> inspecting JSON on the box during an incident
 common_packages:
   - ca-certificates
   - curl
   - unzip
   - jq
-  - awscli
+  - python3-boto3
   - python3-requests
 
 common_extra_packages: []

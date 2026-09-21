@@ -20,7 +20,7 @@
 # own IAM role, and the file it writes is only readable by root.
 - name: Install the credentials helper
   ansible.builtin.template:
-    src: ts-db-credentials.sh.j2
+    src: ts-db-credentials.py.j2
     dest: /usr/local/bin/ts-db-credentials
     owner: root
     group: root
