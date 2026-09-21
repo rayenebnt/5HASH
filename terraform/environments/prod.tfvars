@@ -5,7 +5,7 @@
 
 project_name = "taylorshift"
 environment  = "prod"
-aws_region   = "eu-north-1"
+aws_region   = "eu-west-3"
 vpc_cidr     = "10.40.0.0/16"
 
 availability_zone_count = 3
@@ -15,7 +15,7 @@ db_instance_class       = "db.t3.medium"
 
 http_ingress_cidrs = ["0.0.0.0/0"]
 # admin_ssh_cidrs  = ["203.0.113.0/24"]   # office range only
-# certificate_arn  = "arn:aws:acm:eu-north-1:123456789012:certificate/xxxxxxxx"
+# certificate_arn  = "arn:aws:acm:eu-west-3:123456789012:certificate/xxxxxxxx"
 # domain_name      = "shop.taylorshift.example"
 # route53_zone_id  = "Z0123456789ABCDEFGHIJ"
 # alarm_email      = "ops@taylorshift.example"

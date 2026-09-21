@@ -3,7 +3,7 @@
 
 project_name = "taylorshift"
 environment  = "staging"
-aws_region   = "eu-north-1"
+aws_region   = "eu-west-3"
 vpc_cidr     = "10.30.0.0/16"
 
 availability_zone_count = 2

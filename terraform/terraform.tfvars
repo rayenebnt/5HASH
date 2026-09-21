@@ -6,7 +6,7 @@
 
 project_name = "taylorshift"
 environment  = "dev"
-aws_region   = "eu-north-1"
+aws_region   = "eu-west-3"
 
 # Leave admin_ssh_cidrs empty to restrict SSH on the bastion to the public IP
 # of the machine running Terraform. Set it explicitly for a fixed office range:
