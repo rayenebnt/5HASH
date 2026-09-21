@@ -38,7 +38,8 @@
   ansible.builtin.command:
     cmd: /usr/local/bin/ts-db-credentials
   register: prestashop_credentials
-  changed_when: "'changed' in (prestashop_credentials.stdout | default(''))"
+  # Exact match, not `in`: "changed" is a substring of the negative answer.
+  changed_when: (prestashop_credentials.stdout | default('') | trim) == "changed"
   notify: Restart PrestaShop
 
 - name: Install the PHP configuration of the shop

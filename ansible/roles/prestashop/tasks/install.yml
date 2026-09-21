@@ -104,6 +104,7 @@
   ansible.builtin.command:
     cmd: "/usr/local/bin/ts-db set-domain {{ shop_host }} {{ shop_scheme | default('http') }}"
   register: prestashop_domain
-  changed_when: "'CHANGED' in (prestashop_domain.stdout | default(''))"
+  # Anchored: the script answers "CHANGED domain ..." or "OK domain already ...".
+  changed_when: (prestashop_domain.stdout | default('')) is match('CHANGED')
   run_once: true
   notify: Clear the PrestaShop cache
