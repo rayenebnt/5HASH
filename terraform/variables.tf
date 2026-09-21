@@ -37,7 +37,7 @@ variable "aws_endpoint_url" {
 variable "aws_region" {
   description = "AWS region hosting the stack."
   type        = string
-  default     = "eu-west-3"
+  default     = "eu-north-1"
 }
 
 # --- Network ---------------------------------------------------------------
