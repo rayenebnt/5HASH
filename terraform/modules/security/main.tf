@@ -5,8 +5,10 @@
 # --- Load balancer ---------------------------------------------------------
 
 resource "aws_security_group" "alb" {
-  name        = "${var.name_prefix}-alb"
-  description = "Public entry point: internet -> application load balancer"
+  name = "${var.name_prefix}-alb"
+  # AWS only accepts a-zA-Z0-9. _-:/()#,@[]+=&;{}!$* in a security group
+  # description, so no arrows here.
+  description = "Public entry point: internet to the application load balancer"
   vpc_id      = var.vpc_id
 
   tags = merge(var.tags, { Name = "${var.name_prefix}-alb" })
