@@ -9,11 +9,18 @@ resource "random_id" "snapshot" {
   byte_length = 4
 }
 
+# The password travels through a shell, a docker --env-file and PHP before it
+# reaches MySQL. Restricting it to characters none of them interpret removes a
+# whole class of breakage; 40 characters keep the entropy well above what the
+# punctuation added.
 resource "random_password" "master" {
-  length  = 32
-  special = true
-  # RDS forbids '/', '@', '"' and ' ' in master passwords.
-  override_special = "!#$%&*()-_=+[]{}<>:?"
+  length           = 40
+  special          = true
+  override_special = "-_."
+  min_lower        = 4
+  min_upper        = 4
+  min_numeric      = 4
+  min_special      = 2
 }
 
 resource "aws_db_subnet_group" "this" {

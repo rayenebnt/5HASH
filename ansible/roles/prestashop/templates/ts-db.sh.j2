@@ -20,13 +20,22 @@ if [ ! -r "${ENV_FILE}" ]; then
   exit 1
 fi
 
-set -a
-# shellcheck disable=SC1090
-. "${ENV_FILE}"
-set +a
+# The file is read, never sourced. It is also consumed by `docker --env-file`,
+# which takes values literally, so quoting it is not an option - and a password
+# containing &, (, <, $ or ; would be executed by the shell instead of read.
+read_env() {
+  sed -n "s/^$1=//p" "${ENV_FILE}" | head -1
+}
+
+DB_SERVER="$(read_env DB_SERVER)"
+DB_PORT="$(read_env DB_PORT)"
+DB_NAME="$(read_env DB_NAME)"
+DB_USER="$(read_env DB_USER)"
+DB_PREFIX="$(read_env DB_PREFIX)"
 
 # MYSQL_PWD keeps the password off the command line.
-export MYSQL_PWD="${DB_PASSWD}"
+MYSQL_PWD="$(read_env DB_PASSWD)"
+export MYSQL_PWD
 
 mysql_do() {
   mysql --host="${DB_SERVER}" --port="${DB_PORT}" --user="${DB_USER}" \
