@@ -17,6 +17,7 @@
     env: "{{ prestashop_runtime_env }}"
     volumes:
       - "{{ prestashop_html_dir }}:{{ prestashop_container_html_dir }}"
+      - "{{ prestashop_cache_dir }}:{{ prestashop_container_cache_dir }}"
       - "{{ prestashop_sessions_dir }}:{{ prestashop_container_sessions_dir }}"
       - "{{ prestashop_php_conf_dir }}/zz-taylorshift.ini:/usr/local/etc/php/conf.d/zz-taylorshift.ini:ro"
     healthcheck:

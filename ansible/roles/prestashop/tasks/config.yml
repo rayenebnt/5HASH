@@ -50,6 +50,14 @@
     mode: "0644"
   notify: Restart PrestaShop
 
+- name: Create the local cache directory
+  ansible.builtin.file:
+    path: "{{ prestashop_cache_dir }}"
+    state: directory
+    owner: "{{ prestashop_www_uid }}"
+    group: "{{ prestashop_www_gid }}"
+    mode: "0755"
+
 # The document root must stay empty until the installer has run: the image only
 # unpacks PrestaShop into a directory it finds empty.
 #

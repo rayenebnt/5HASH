@@ -13,10 +13,12 @@
     - "'No such container' not in prestashop_restart.stderr"
   listen: Restart PrestaShop
 
-# PrestaShop caches its configuration - including the shop URL - in var/cache.
+# PrestaShop compiles its configuration - including the shop URL - into
+# var/cache, which lives on each instance's own disk. The contents go, not the
+# directory itself: it is a bind mount, and removing it would break the mount
+# under the running container.
 - name: Clear the PrestaShop cache
-  ansible.builtin.file:
-    path: "{{ prestashop_html_dir }}/var/cache"
-    state: absent
-  run_once: true
+  ansible.builtin.command:
+    cmd: "find {{ prestashop_cache_dir }} -mindepth 1 -maxdepth 1 -exec rm -rf {} +"
+  changed_when: true
   listen: Clear the PrestaShop cache

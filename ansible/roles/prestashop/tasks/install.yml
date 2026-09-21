@@ -45,6 +45,7 @@
             env: "{{ prestashop_install_env }}"
             volumes:
               - "{{ prestashop_html_dir }}:{{ prestashop_container_html_dir }}"
+              - "{{ prestashop_cache_dir }}:{{ prestashop_container_cache_dir }}"
           # The environment carries the back-office password.
           no_log: true
 
@@ -67,8 +68,8 @@
             timeout: 30
           register: prestashop_install_http
           until: prestashop_install_http is succeeded
-          retries: 30
-          delay: 10
+          retries: "{{ prestashop_serve_retries }}"
+          delay: "{{ prestashop_serve_delay }}"
           changed_when: false
       rescue:
         - name: Collect the installer logs

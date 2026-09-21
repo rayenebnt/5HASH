@@ -18,9 +18,17 @@ prestashop_sessions_dir: "{{ prestashop_data_root }}/sessions"
 prestashop_config_dir: /etc/prestashop
 prestashop_php_conf_dir: "{{ prestashop_config_dir }}/php"
 
+# Symfony's compiled cache never belongs on the shared file system: it is
+# derived data, regenerated per instance, and deleting a file that is still
+# open over NFS leaves a .nfsXXXX entry behind - which is what makes
+# PrestaShop's post-install cache clear die on "Directory not empty".
+# Keeping it on the instance disk also takes the hottest path off the network.
+prestashop_cache_dir: /var/lib/prestashop/cache
+
 # Paths as seen from inside the container.
 prestashop_container_html_dir: /var/www/html
 prestashop_container_sessions_dir: /var/lib/php-sessions
+prestashop_container_cache_dir: /var/www/html/var/cache
 
 # www-data inside the Debian based image.
 prestashop_www_uid: 33
@@ -59,3 +67,6 @@ prestashop_log_max_file: "3"
 # Bound the installer: a hung installer must fail the deployment, not hang it.
 prestashop_install_retries: 60
 prestashop_install_delay: 15
+# Unpacking PrestaShop onto EFS takes minutes; the shop only answers afterwards.
+prestashop_serve_retries: 40
+prestashop_serve_delay: 15
