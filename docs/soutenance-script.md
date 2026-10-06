@@ -1,272 +1,287 @@
-# Soutenance — ce qu'on dit, diapo par diapo
+# Soutenance — texte à lire
 
 Ce texte accompagne `docs/soutenance-5hash.pptx`. Il est **aussi dans les notes
-de présentateur** de chaque diapositive : en mode Présentateur, vous avez la
-diapo au mur et le texte sur votre écran.
+de présentateur** de chaque diapositive : en mode Présentateur, la diapositive
+s'affiche au mur et le texte sur votre écran.
 
-**Ne l'apprenez pas par cœur.** Lisez-le deux fois à voix haute, retenez les
-phrases en gras, et dites le reste avec vos mots. Une soutenance où on récite
-s'entend tout de suite.
+Lisez-le deux fois à voix haute, retenez les phrases en gras, dites le reste avec
+vos mots.
 
-**Durée : 12 min de présentation + 4 min de démo + questions.**
+**Durée : 12 minutes de présentation, 4 minutes de démonstration, puis
+questions.**
 
-| # | Diapo | Qui parle | Temps |
+| # | Diapositive | Qui parle | Temps |
 |---|---|---|---|
 | 1 | Titre | 1 | 40 s |
 | 2 | Trois questions | 1 | 50 s |
-| 3 | L'architecture | 1 | 1 min 30 |
+| 3 | Architecture | 1 | 1 min 30 |
 | 4 | Nos choix | 1 | 1 min 20 |
 | 5 | Terraform | 2 | 1 min 20 |
 | 6 | Ansible | 2 | 1 min 30 |
-| 7 | Le jour de l'ouverture | 2 | 1 min 10 |
-| 8 | Quand ça casse | 2 | 1 min 10 |
-| 9 | Ce qu'on a appris | 3 | 1 min 30 |
-| 10 | Ce qu'on n'a pas fait | 3 | 1 min 10 |
+| 7 | Montée en charge | 2 | 1 min 10 |
+| 8 | Pannes | 2 | 1 min 10 |
+| 9 | Problèmes rencontrés | 3 | 1 min 30 |
+| 10 | Limites | 3 | 1 min 10 |
 | 11 | Démonstration | 3 | 4 min |
-| 12 | Questions | tous | — |
+| 12 | Conclusion et questions | tous | — |
 
 ---
 
 ## 1 — Titre
 
-Bonjour à tous. On est l'agence 5HASH, et Taylor Shift nous a confié sa boutique
-de billets.
+Bonjour. Nous sommes l'agence 5HASH. Taylor Shift nous a confié l'infrastructure
+de sa boutique de billets.
 
-Le site, il existe déjà : c'est PrestaShop. Nous, on ne touche pas au site.
-**Notre travail, c'est de lui construire une maison** — et surtout une maison qui
-tient debout le jour où des milliers de fans se connectent en même temps.
+L'application existe déjà : c'est PrestaShop, l'image publiée sur Docker Hub.
+**Nous ne touchons pas au code du site.** Notre travail, c'est de l'héberger, de
+le configurer, et de faire en sorte qu'il tienne le jour de l'ouverture des
+ventes.
 
-Tout est écrit en code : Terraform pour construire, Ansible pour installer. Et ce
-n'est pas une maquette : **ça tourne en ce moment sur un vrai compte AWS.** On
-vous le montrera à la fin.
-
----
-
-## 2 — On s'est posé trois questions
-
-Avant de choisir la moindre technologie, on s'est posé trois questions toutes
-bêtes.
-
-**Un : comment un client arrive jusqu'à la boutique ?** Autrement dit, par où ça
-rentre, et qu'est-ce qu'on laisse ouvert.
-
-**Deux : et si dix fois plus de monde arrive d'un coup ?** Parce qu'une ouverture
-de billetterie, ce n'est pas un trafic régulier. C'est un mur.
-
-**Trois : et si une machine tombe ?** Parce qu'une machine finit toujours par
-tomber.
-
-Tout ce qu'on va vous montrer répond à l'une de ces trois questions.
+Nous avons utilisé deux outils : **Terraform pour créer l'infrastructure, Ansible
+pour configurer les serveurs.** Tout est déployé sur un compte AWS réel, en
+région Paris. Nous ferons une démonstration à la fin.
 
 ---
 
-## 3 — L'architecture
+## 2 — Trois questions au départ
 
-*(Prenez votre temps sur cette diapo, c'est la plus importante. Montrez avec la
-main, de haut en bas.)*
+Avant de choisir les technologies, nous avons posé trois questions.
 
-Pour expliquer l'architecture, on va prendre **l'image d'une salle de concert**.
-Ça se lit de haut en bas, comme le trajet d'un client.
+**Première question : par où passent les requêtes ?** C'est la question du réseau
+et de la sécurité. Notre réponse : un seul point d'entrée public, et tout le
+reste dans des réseaux privés.
 
-En haut, côté rue, il y a **une seule porte : le répartiteur**. C'est l'hôte
-d'accueil. Il envoie chaque visiteur vers une caisse libre, et il vérifie toutes
-les quinze secondes que chaque caisse va bien. Si une caisse ne répond plus, il
-arrête d'y envoyer du monde.
+**Deuxième question : comment absorber un pic de trafic ?** Une ouverture de
+billetterie, c'est un pic, pas une charge régulière. Notre réponse : les serveurs
+ne stockent aucune donnée, donc on peut en ajouter à la demande.
 
-À côté, **l'entrée de service**. Elle, elle est réservée à l'équipe : c'est par
-là qu'on passe pour installer et dépanner. Elle est ouverte à une seule adresse,
-la nôtre. Aucun client ne passe par là.
+**Troisième question : que se passe-t-il en cas de panne ?** Notre réponse : le
+load balancer retire automatiquement le serveur en panne, et les autres
+continuent de répondre.
 
-Au milieu, **les caisses** : les serveurs qui font tourner la boutique. Elles
-sont toutes identiques. Et surtout, **elles ne sont pas joignables depuis
-Internet** — on ne peut y arriver qu'en passant par la porte d'accueil.
+Chaque choix que nous présentons ensuite répond à l'une de ces trois questions.
 
-En bas, les réserves. **Le coffre**, c'est la base de données : les billets, les
-paniers, les commandes. **Le vestiaire**, c'est un disque partagé : les images du
-site, le thème, et les paniers en cours.
+---
 
-*(Pause. C'est la phrase à faire entendre.)*
+## 3 — Architecture
 
-Et voilà le point important : **les caisses ne gardent rien.** Tout est dans le
-coffre et dans le vestiaire. C'est exactement ce qui va nous permettre d'en
-ajouter, ou d'en perdre, sans que personne ne s'en aperçoive.
+*(Diapositive importante. Montrez les trois niveaux avec la main, de haut en
+bas.)*
+
+Voici l'architecture. Elle se lit de haut en bas, dans le sens d'une requête.
+
+**Premier niveau : le réseau public.** Il contient deux éléments. Le load
+balancer, qui est le seul point d'entrée des clients : il répartit les requêtes
+entre les serveurs et vérifie leur état toutes les quinze secondes. Et le
+bastion, qui sert uniquement à notre accès SSH : il est ouvert à une seule
+adresse IP, la nôtre. Aucun client ne passe par le bastion.
+
+**Deuxième niveau : le réseau privé applicatif.** Il contient les serveurs EC2
+avec le conteneur PrestaShop. Ils sont identiques entre eux, répartis sur les
+deux zones de disponibilité, et ils n'ont aucune adresse IP publique : on ne peut
+les joindre qu'à travers le load balancer.
+
+**Troisième niveau : le réseau privé des données.** La base MySQL d'un côté, le
+disque partagé de l'autre. Ce niveau n'a aucune route vers Internet.
+
+*(Pause avant la phrase suivante.)*
+
+Le point à retenir : **les serveurs ne stockent aucune donnée.** Le catalogue et
+les commandes sont dans la base, les images et les sessions sur le disque
+partagé. C'est ce qui permet d'ajouter ou de perdre un serveur sans conséquence
+— et c'est la base des deux diapositives suivantes.
 
 ---
 
 ## 4 — Nos choix
 
-Le sujet nous laissait libres : ce qui tourne sur nos serveurs, et ce qu'on
-confie à AWS. Voilà comment on a tranché.
+Le sujet nous laissait libres de choisir ce qui tourne sur EC2 et ce qu'on confie
+à un service managé. Voici nos choix.
 
-**La boutique** tourne dans un conteneur Docker, sur un serveur EC2. C'est ce que
-demande le sujet, et ça nous arrange : changer de version de PrestaShop, c'est
-une seule ligne à modifier.
+**L'application** tourne dans un conteneur Docker sur une instance EC2. C'est ce
+que demande le sujet. Le conteneur donne un environnement identique partout, et
+changer de version de PrestaShop revient à modifier une ligne.
 
-**La base de données, par contre, on ne veut pas la gérer.** AWS s'occupe des
-sauvegardes, des mises à jour, et garde une machine de secours prête à prendre le
-relais. Franchement, personne n'a envie de découvrir un problème de base de
-données le soir de l'ouverture des ventes.
+**La base de données est managée**, c'est RDS. AWS gère les sauvegardes
+automatiques, les mises à jour de sécurité et le basculement vers une instance de
+secours. Nous n'avons pas voulu réécrire ça nous-mêmes.
 
-**Pour les fichiers**, il nous fallait un disque que plusieurs serveurs voient en
-même temps. Un disque classique ne se partage pas. EFS, si.
+**Pour les fichiers**, il fallait un stockage que plusieurs serveurs lisent et
+écrivent en même temps. Un disque EBS ne se partage pas entre instances, EFS si.
 
-**Et les mots de passe** : celui de la base n'est écrit nulle part dans notre
-code. Terraform le génère, le dépose dans le coffre d'AWS, et chaque serveur va
-le chercher tout seul avec sa propre autorisation. Dans le dépôt, il n'y a que le
-mot de passe de l'administration du site, et il est chiffré.
+**Pour les secrets**, le mot de passe de la base est généré par Terraform et
+déposé dans Secrets Manager. Il n'est pas dans le dépôt. Chaque serveur va le
+chercher avec son propre rôle IAM. Seuls les identifiants du back-office sont
+dans le dépôt, chiffrés avec Ansible Vault.
+
+**Enfin**, les serveurs n'ont pas d'adresse publique. L'accès administration
+passe par un bastion, ouvert à notre seule adresse IP.
 
 ---
 
 ## 5 — Terraform
 
-Terraform, c'est **l'outil qui construit**. On lui décrit ce qu'on veut, il se
-débrouille pour le créer.
+Terraform crée l'infrastructure. On décrit les ressources voulues, Terraform les
+crée et retient ce qu'il a créé.
 
-On a découpé en **six briques**, une par couche : le réseau, les droits, le
-disque, la base, les serveurs, et l'entrée. Chaque brique se relit toute seule,
-et si on veut en changer une, on ne casse pas les autres.
+Nous avons découpé le code en **six modules**, un par couche : le réseau, les
+groupes de sécurité, le stockage, la base, les instances et le load balancer.
+Chaque module a ses variables documentées et ses sorties. On peut en relire un
+sans lire les autres.
 
-Le truc dont on est contents : **les trois environnements**. Test,
-pré-production, production. C'est exactement le même code. On change un mot, et
-on passe d'un serveur à trois serveurs répartis sur trois zones, avec une base
-qui a une machine de secours et deux semaines de sauvegardes.
+**Pour les environnements**, nous avons dev, staging et prod. C'est le même code.
+Une table de variables définit les tailles : en dev, un serveur et une base
+simple ; en prod, trois serveurs sur trois zones, une base avec instance de
+secours, et quatorze jours de sauvegardes. On change une variable, pas le code.
 
-La description de l'infrastructure est **stockée sur AWS, pas sur nos
-ordinateurs**, et elle est verrouillée : à trois, on ne peut pas se marcher
-dessus.
+**L'état Terraform**, c'est-à-dire la liste de ce qui a été créé, est stocké dans
+un bucket S3 versionné et chiffré, avec un verrou. C'est nécessaire à trois :
+sans ça, deux personnes peuvent modifier l'infrastructure en même temps.
 
-Et **rien n'est écrit en dur**. Terraform va même chercher notre adresse IP du
-moment, et c'est la seule qui aura le droit de se connecter aux serveurs.
+**Enfin, trois valeurs sont lues automatiquement** à l'exécution : l'identifiant
+de l'image Ubuntu, la liste des zones disponibles, et notre adresse IP publique.
+Cette dernière sert à autoriser l'accès SSH au bastion.
 
 ---
 
 ## 6 — Ansible
 
-Ansible, c'est **l'outil qui installe**. Une fois que Terraform a construit les
-machines, Ansible les configure.
+Ansible configure les serveurs créés par Terraform : il installe Docker, monte le
+disque partagé, récupère le mot de passe de la base et démarre le conteneur
+PrestaShop.
 
-Le problème classique, c'est de faire le lien entre les deux : Terraform crée un
-serveur, et il faut donner son adresse à Ansible. Beaucoup de gens recopient à la
-main. **Nous, non.**
+**Le point d'intégration entre les deux outils est ici.** Terraform connaît les
+adresses des serveurs. Plutôt que de les recopier dans un fichier d'inventaire,
+Terraform les déclare dans son état, et Ansible les lit depuis cet état avec un
+plugin d'inventaire dynamique.
 
-Terraform écrit la liste des serveurs dans sa propre description, et **Ansible va
-la lire directement chez lui**. Résultat : il n'y a pas une seule adresse IP
-écrite à la main dans tout le projet. On crée un serveur avec Terraform, il
-apparaît tout seul dans la liste d'Ansible.
+Conséquence : **il n'y a aucune adresse IP écrite à la main dans le projet.**
+Quand on ajoute un serveur avec Terraform, il apparaît automatiquement dans
+l'inventaire Ansible.
 
-On a écrit **trois rôles réutilisables**. Le serveur d'entrée et les caisses
-partagent le même rôle de base, juste avec des réglages différents. Et pour
-Docker, on a pris un rôle public, installé depuis Ansible Galaxy, plutôt que de
-le réécrire.
+Nous avons écrit **trois rôles réutilisables** : `common`, `efs` et
+`prestashop`. Le bastion et les serveurs applicatifs utilisent le même rôle
+`common`, avec des variables différentes. Pour Docker, nous avons utilisé un rôle
+existant d'Ansible Galaxy plutôt que de le réécrire.
+
+Les identifiants du back-office sont chiffrés avec Ansible Vault. Le mot de passe
+de la base n'est pas dans le dépôt du tout.
 
 *(Montrez l'encadré vert.)*
 
-Et le point le plus important : **on peut relancer l'installation autant de fois
-qu'on veut.** La deuxième fois, Ansible affiche « changed égale zéro ». Il ne
-touche à rien, parce que tout est déjà comme demandé. Ce n'est pas de la chance :
-on a conçu l'installation pour ça.
+Enfin, **le playbook est idempotent** : il décrit l'état voulu, pas une suite
+d'étapes. À la deuxième exécution, il affiche `changed=0` : il ne modifie rien,
+parce que tout est déjà en place.
 
 ---
 
-## 7 — Le jour de l'ouverture
+## 7 — Montée en charge
 
-On arrive à la question qui compte vraiment.
+Voici comment nous répondons à un pic de trafic.
 
-Nos serveurs ne gardent rien. Une commande va dans la base, une image sur le
-disque partagé, un panier aussi. Résultat : **ajouter de la capacité, c'est
-littéralement changer un chiffre.**
+Les serveurs ne stockent aucune donnée : les commandes sont dans la base, les
+images et les sessions sur le disque partagé. **Ajouter de la capacité revient
+donc à modifier une variable.**
 
-Deux commandes. La première crée les serveurs et les répartit sur les zones. La
-deuxième les installe — et seulement eux, parce qu'Ansible ne touche pas à ceux
-qui travaillent déjà. **Trois minutes, sans couper la boutique.**
+Deux commandes. La première, Terraform, crée les serveurs, les répartit sur les
+zones et les enregistre auprès du load balancer. La deuxième, Ansible, les
+configure. Comme le playbook est idempotent, **il ne touche pas aux serveurs déjà
+en service**. L'opération prend environ trois minutes, sans interruption.
 
-Et on ne décide pas au hasard. AWS surveille trois choses pour nous et nous
-envoie un mail : si le site devient lent, si un serveur ne répond plus, ou si la
-boutique renvoie des erreurs. C'est ça qui nous dit quand ajouter des machines.
+Pour savoir quand le faire, **trois alarmes CloudWatch** sont créées avec le load
+balancer. La première surveille le temps de réponse : au-delà de deux secondes en
+moyenne sur trois minutes, les serveurs saturent. La deuxième compte les serveurs
+retirés de la rotation. La troisième compte les erreurs serveur. Les trois
+notifient une adresse mail.
 
 ---
 
-## 8 — Quand ça casse
+## 8 — Pannes
 
-On a regardé chaque panne possible, et **on a chronométré**.
+Nous avons mesuré le comportement dans chaque cas de panne.
 
-**Un serveur tombe.** Le répartiteur l'interroge toutes les quinze secondes ; au
-bout de deux échecs, donc trente secondes, il arrête de lui envoyer des clients.
-Et les achats déjà en cours ont trente secondes de plus pour se terminer. Le
-client ne voit rien : il est servi par les autres.
+**Un serveur tombe.** Le load balancer le vérifie toutes les quinze secondes.
+Après deux échecs, soit environ trente secondes, il le retire de la rotation. Les
+requêtes déjà en cours ont trente secondes supplémentaires pour se terminer. Le
+client ne voit rien : il est servi par les autres serveurs.
 
-**Une zone AWS entière tombe** — ça arrive, c'est un bâtiment entier. Les
-serveurs des autres zones prennent le relais. Automatique.
+**Une zone de disponibilité tombe.** Le load balancer a un nœud par zone, il
+cesse d'utiliser celui de la zone en panne. Les serveurs des autres zones
+prennent le relais. Aucune action de notre part.
 
-**La base tombe.** En production, AWS garde une machine de secours dans une autre
-zone. La bascule prend une à deux minutes. Il y a quelques secondes d'erreurs, on
-ne va pas vous mentir, puis ça repart.
+**La base de données tombe.** En production, elle a une instance de secours dans
+une autre zone. Le basculement prend entre une et deux minutes. Il y a des
+erreurs pendant ce temps, nous ne le cachons pas, puis le service revient.
 
-**Notre serveur d'entrée tombe** : aucun impact client, personne ne passe par là.
+**Le bastion tombe.** Aucune conséquence pour les clients : il ne sert qu'à
+l'administration. Il faut le recréer, ce qui prend deux minutes.
 
 *(Pause, puis l'encadré orange.)*
 
-Et le point qu'on veut vraiment que vous reteniez : **le panier du client est
-conservé.** Les paniers sont sur le disque partagé, pas sur la machine qui tombe.
-Pour une billetterie, c'est toute la différence.
+Un point important : **le panier du client est conservé.** Les sessions PHP sont
+stockées sur le disque partagé, pas sur le serveur. Si un serveur tombe, le
+client continue son achat sur un autre.
 
 ---
 
-## 9 — Ce qu'on a appris
+## 9 — Problèmes rencontrés
 
-On tenait à vous montrer cette diapo, parce que c'est **la partie honnête du
-projet**.
+Nous présentons cette diapositive parce qu'elle montre ce que le déploiement réel
+apporte.
 
-Le code était écrit, relu, vérifié. Et puis on l'a déployé pour de vrai sur AWS,
-et on s'est pris **quatre murs qu'aucune relecture n'aurait montrés**.
+Le code était écrit, relu et vérifié. **En le déployant sur un compte AWS, nous
+avons rencontré quatre erreurs** qu'une relecture n'aurait pas montrées.
 
-**Le premier** : AWS n'accepte que certains caractères dans les descriptions. On
-avait écrit une petite flèche, avec un chevron. Refusé.
+**Première erreur** : AWS n'accepte qu'un jeu de caractères limité dans les
+descriptions de groupes de sécurité. Nous avions écrit une flèche avec un
+chevron. La création du groupe a échoué.
 
-**Le deuxième** : l'outil en ligne de commande d'AWS n'existe plus dans les
-dépôts d'Ubuntu 24.04. On aurait pu installer la version officielle — soixante
-mégaoctets par serveur, pour un seul appel. On est passés à une bibliothèque
-Python déjà présente.
+**Deuxième erreur** : le paquet `awscli` n'existe plus dans les dépôts d'Ubuntu
+24.04. Installer la version officielle représentait soixante mégaoctets par
+serveur pour un seul appel. Nous l'avons remplacé par la bibliothèque Python
+boto3, déjà disponible dans les dépôts de base.
 
-**Le troisième, c'est notre préféré.** Le mot de passe de la base est généré au
-hasard, et il contenait une esperluette, le « et commercial ». Notre script
-chargeait le fichier avec une commande du shell — et **le shell a pris le mot de
-passe pour une commande, et a essayé de l'exécuter.** Maintenant on lit le
-fichier sans jamais l'interpréter, et on a limité les caractères du mot de passe.
+**Troisième erreur** : notre script chargeait le fichier de configuration avec la
+commande `source` du shell. Le mot de passe de la base, généré aléatoirement,
+contenait une esperluette. Le shell l'a interprétée comme un séparateur de
+commande. Nous lisons maintenant ce fichier sans l'interpréter, et nous avons
+restreint les caractères du mot de passe généré.
 
-**Le quatrième** : PrestaShop vide son cache après l'installation. Sur un disque
-partagé en réseau, supprimer un fichier encore ouvert laisse une trace invisible,
-donc la suppression échouait — et ça tuait le conteneur juste après une
-installation réussie. On a compris que ce cache n'avait rien à faire sur le
-disque partagé : c'est un fichier temporaire, propre à chaque serveur. On l'a
-remis en local.
+**Quatrième erreur** : sur un disque réseau, supprimer un fichier encore ouvert
+laisse une entrée temporaire. Le vidage de cache de PrestaShop échouait donc
+après l'installation, et arrêtait le conteneur. Nous avons déplacé ce cache sur
+le disque local de chaque serveur, puisqu'il est propre à chaque serveur et
+régénérable.
 
-Les quatre sont corrigés dans le dépôt. **Un déploiement depuis zéro ne les
-rencontre plus.**
+**Les quatre corrections sont dans le dépôt.** Un déploiement depuis zéro ne les
+rencontre plus.
 
 ---
 
-## 10 — Ce qu'on n'a pas fait
+## 10 — Limites
 
-Une infrastructure dont on ne connaît pas les limites, c'est une infrastructure
-qu'on n'a pas comprise. Voilà les nôtres, en toute transparence.
+Voici les limites de notre solution.
 
-**La première, la plus importante : ajouter des serveurs, ça demande quelqu'un.**
-Ce n'est pas automatique. Un pic soudain, il faut un opérateur et deux commandes
-— trois minutes. Pour l'automatiser vraiment, il faudrait préparer à l'avance une
-image toute faite du serveur, avec tout déjà installé. Et bonne nouvelle : notre
-installation est déjà écrite pour ça. C'est une évolution, pas une réécriture.
+**Première limite, la principale : la montée en charge n'est pas automatique.**
+Elle demande un opérateur et deux commandes, environ trois minutes. Pour
+l'automatiser, il faudrait construire à l'avance une image serveur préconfigurée,
+avec Packer, puis utiliser un groupe d'autoscaling derrière le même load
+balancer. Notre rôle Ansible et notre page de santé sont déjà compatibles avec
+cette évolution.
 
-**La deuxième** : on a mis tout le site sur le disque partagé. C'est ce qui rend
-les serveurs interchangeables, mais un disque réseau est plus lent qu'un disque
-local. Au-delà de quelques milliers de visiteurs par minute, il faudrait mettre
-le site dans l'image et ne garder que les photos sur le disque partagé.
+**Deuxième limite** : le site entier est sur le disque partagé. Cela rend les
+serveurs interchangeables, mais un disque réseau est plus lent qu'un disque local
+pour lire des fichiers PHP. Au-delà de quelques milliers de requêtes par minute,
+il faudrait mettre le code dans l'image Docker et ne partager que les images
+produits.
 
-**La troisième** : une seule base pour écrire. On peut ajouter des copies pour la
-lecture, mais une billetterie, ça écrit surtout.
+**Troisième limite** : une seule base en écriture. On peut répartir les lectures
+sur des réplicas, pas les écritures. Une billetterie écrit beaucoup, donc la
+taille de l'instance principale est notre plafond.
 
-**Et la quatrième** : une seule région. Si toute la région Paris tombe, on tombe.
-Doubler ailleurs coûterait plus cher que la panne qu'on évite. C'est assumé.
+**Quatrième limite** : une seule région. Une panne régionale interrompt le
+service. À cette échelle, le multi-région coûterait plus cher que la panne qu'il
+évite. C'est un choix, pas un oubli.
 
 ---
 
@@ -274,90 +289,89 @@ Doubler ailleurs coûterait plus cher que la panne qu'on évite. C'est assumé.
 
 > **À faire avant de passer** : lancez `terraform apply` puis le playbook, et
 > vérifiez que la boutique répond. Gardez deux onglets ouverts : la boutique et
-> l'administration. **Ne déployez pas en direct** — douze minutes de création de
-> base de données devant un jury, c'est très long.
+> le back-office. **Ne déployez pas en direct** : la création de la base prend
+> douze minutes.
 
-Voilà tout ce qu'il y a à taper. **Six commandes.**
+Voici l'ensemble des commandes nécessaires. **Six commandes.**
 
-La première, on ne la lance qu'une fois par compte : elle prépare l'endroit où
-Terraform range sa description de l'infrastructure.
+La première ne se lance qu'une fois par compte AWS : elle crée le bucket S3 qui
+stocke l'état Terraform.
 
-Ensuite Terraform construit. Une douzaine de minutes, et c'est la base de données
-qui prend tout le temps.
+Ensuite, Terraform : `init` puis `apply`. L'opération prend une douzaine de
+minutes, dont la majorité pour la création de la base de données.
 
-Puis Ansible installe. **Regardez bien la commande du milieu** : c'est celle qui
-affiche la liste des serveurs. Aucune adresse n'y est écrite, elle est lue chez
-Terraform.
+Puis Ansible : on installe les dépendances depuis Galaxy, on vérifie
+l'inventaire, et on lance le playbook. **La commande du milieu affiche la liste
+des serveurs** : aucune adresse n'y est écrite, elle vient de l'état Terraform.
 
-### Les quatre choses à montrer
+### Les quatre points à montrer
 
-**1. La boutique.** Ouvrez le catalogue, cliquez sur un produit, puis connectez-
-vous à l'administration.
-> « Les billets viennent de la base de données, les images du disque partagé. »
+**1. La boutique et le back-office.** Ouvrez le catalogue, cliquez sur un
+produit, puis connectez-vous au back-office.
+> « Le catalogue vient de RDS, les images du disque partagé. »
 
-**2. On relance l'installation.**
+**2. Le playbook relancé.**
 `ansible-playbook -i ansible/inventory.yml ansible/site.yml --ask-vault-pass`
-> « changed égale zéro. Rien à faire : la machine est déjà comme on l'a
-> demandé. »
+> « changed=0 : aucune modification, les serveurs sont déjà dans l'état décrit. »
 
-**3. On ajoute un serveur.**
+**3. L'ajout d'un serveur.**
 `terraform -chdir=terraform apply -var app_instance_count=2`, puis le playbook.
-Montrez `ansible-inventory --graph` : le nouveau serveur est apparu tout seul.
-Puis la console AWS : deux serveurs en bonne santé derrière le répartiteur.
+Montrez `ansible-inventory --graph` : le nouveau serveur y est apparu seul. Puis
+la console AWS : deux serveurs sains dans le groupe de cibles.
 
-**4. On en casse un.** Sur un serveur : `sudo docker stop prestashop`.
-Rafraîchissez la boutique — **elle répond toujours**, servie par l'autre. Dans la
-console AWS, le premier passe « unhealthy » en une trentaine de secondes.
+**4. L'arrêt d'un serveur.** Sur une instance : `sudo docker stop prestashop`.
+Rafraîchissez la boutique : **elle répond toujours**, servie par l'autre serveur.
+Dans la console AWS, le premier passe en `unhealthy` après une trentaine de
+secondes.
 
 ---
 
-## 12 — Questions
+## 12 — Conclusion et questions
 
-Pour conclure. La boutique est **en ligne** sur un vrai compte AWS. Elle est
-**documentée** : le README explique comment l'installer, la faire grandir, la
-dépanner et la supprimer. Et **on sait la refaire** : on l'a détruite et
-redéployée pour en être sûrs.
+La boutique est **déployée** sur un compte AWS réel. Elle est **documentée** : le
+README explique comment la déployer, l'exploiter, la mettre à l'échelle, la
+dépanner et la supprimer. Et elle est **reproductible** : nous l'avons détruite
+et redéployée pour le vérifier.
 
-Merci de votre attention, on est prêts pour vos questions.
+Merci de votre attention, nous répondons à vos questions.
 
-### Les réponses à avoir en tête
+### Réponses préparées
 
-**« Pourquoi pas d'ajout automatique de serveurs ? »**
-Parce qu'on installe nos serveurs avec Ansible après leur création. Pour que ce
-soit automatique, il faudrait une image toute prête, construite à l'avance. On a
-préféré livrer quelque chose qui marche et dont on connaît la limite, plutôt
-qu'un système automatique qui lancerait des machines vides.
+**« Pourquoi pas d'autoscaling ? »**
+Parce que nos serveurs sont configurés par Ansible après leur création. Un groupe
+d'autoscaling lancerait des machines non configurées. Pour le faire correctement,
+il faudrait d'abord construire une image préconfigurée avec Packer. Nous avons
+préféré livrer une solution qui fonctionne et dont nous connaissons la limite.
 
 **« Pourquoi EFS et pas S3 ? »**
-Parce que PrestaShop écrit sur un disque, tout simplement. Passer par S3
-demanderait d'installer un module en plus dans PrestaShop. EFS, l'application ne
-voit même pas la différence.
+Parce que PrestaShop écrit sur un système de fichiers. Utiliser S3 demanderait
+d'installer un module PrestaShop supplémentaire. Avec EFS, l'application ne voit
+pas de différence.
 
 **« Où est le mot de passe de la base ? »**
-Nulle part chez nous. Terraform le génère, AWS le garde dans son coffre, et
-chaque serveur va le chercher avec sa propre autorisation. Il n'est même pas dans
-la liste d'Ansible.
+Dans AWS Secrets Manager. Terraform le génère et l'y dépose ; chaque serveur le
+lit avec son rôle IAM. Il n'est ni dans le dépôt, ni dans l'inventaire Ansible.
 
-**« Et si votre serveur d'entrée tombe pendant une vente ? »**
-Aucun impact : il ne sert qu'à nous. Et les serveurs acceptent aussi une
-connexion par un service d'AWS, qui ne passe pas par lui.
+**« Et si le bastion tombe pendant une vente ? »**
+Aucune conséquence : il ne sert qu'à l'administration. Les instances acceptent
+aussi SSM Session Manager, qui ne passe pas par le bastion.
 
 **« Combien ça coûte ? »**
-Deux à trois dollars par jour pour l'environnement de test. Et ce ne sont pas les
-serveurs qui coûtent le plus : c'est la passerelle réseau et le répartiteur.
+Environ deux à trois dollars par jour pour l'environnement dev. Les postes
+principaux sont la passerelle NAT et le load balancer, pas les instances.
 
-**« Comment vous changez de version de PrestaShop ? »**
-Une ligne dans un fichier Ansible : on change le numéro de version, on relance.
-On prend une sauvegarde de la base avant, évidemment.
+**« Comment changez-vous de version de PrestaShop ? »**
+C'est une variable dans les `group_vars` Ansible. On modifie le tag de l'image et
+on relance le playbook, après une sauvegarde de la base.
 
 **« Pourquoi trois niveaux de réseau ? »**
-Pour que la base de données n'ait aucun chemin vers Internet, et que les serveurs
-n'aient aucune adresse publique. Seul le premier niveau est exposé, et il ne
-contient que le répartiteur et notre entrée de service.
+Pour que la base n'ait aucune route vers Internet, et que les serveurs n'aient
+aucune adresse publique. Seul le niveau public est exposé, et il ne contient que
+le load balancer et le bastion.
 
-**« Vous avez testé sur Floci ? »**
-Oui, et c'est écrit dans le README. Les serveurs et la base y fonctionnent
-vraiment, mais le disque partagé n'y est qu'une façade, le répartiteur ne fait
-passer aucun trafic, et on ne peut pas y lancer Docker. Comme le sujet demande
-l'image PrestaShop sur un serveur EC2, on a visé le vrai AWS. Le profil Floci
-reste dans le dépôt pour répéter la partie Terraform sans payer.
+**« Avez-vous testé sur Floci ? »**
+Oui, et c'est documenté dans le README. EC2 et RDS y sont de vrais conteneurs,
+mais EFS n'a pas de plan de données NFS, le load balancer ne transmet aucun
+paquet, et les instances ne peuvent pas exécuter Docker. Comme le sujet impose
+l'image PrestaShop sur EC2, nous avons visé AWS réel. Un profil Floci reste dans
+le dépôt pour tester la partie Terraform sans frais.

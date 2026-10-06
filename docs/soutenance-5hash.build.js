@@ -21,7 +21,7 @@ const pres = new PptxGenJS();
 pres.layout = "LAYOUT_WIDE"; // 13.33 x 7.5
 pres.author = "5HASH";
 pres.company = "5HASH";
-pres.title = "Taylor Shift - La boutique de billets";
+pres.title = "Taylor Shift - Infrastructure de la boutique";
 
 const MX = 0.62;
 const CW = 13.33 - MX * 2;
@@ -68,11 +68,11 @@ function code(slide, lines, o) {
   });
 }
 
-// une phrase simple, en amber, qui donne l'image a retenir
+// la conclusion factuelle de la diapositive
 function keyLine(slide, text, y) {
   slide.addText(text, {
     x: MX, y, w: CW, h: 0.4, isTextBox: true, margin: 0,
-    fontFace: B, fontSize: 15, italic: true, color: AMBER_DK,
+    fontFace: B, fontSize: 15, bold: true, color: AMBER_DK,
   });
 }
 
@@ -90,39 +90,39 @@ s.addText("Taylor Shift", {
   x: MX, y: 2.1, w: CW, h: 1.15, isTextBox: true, margin: 0,
   fontFace: H, fontSize: 60, bold: true, color: PAPER,
 });
-s.addText("Une boutique de billets qui tient debout\nle jour de l'ouverture des ventes", {
-  x: MX, y: 3.25, w: 9.6, h: 0.9, isTextBox: true, margin: 0,
-  fontFace: B, fontSize: 21, color: "A8B8C8", lineSpacing: 28,
+s.addText("Infrastructure de la boutique de billets", {
+  x: MX, y: 3.3, w: 9.6, h: 0.5, isTextBox: true, margin: 0,
+  fontFace: B, fontSize: 22, color: "A8B8C8",
 });
 const chips = ["Terraform", "Ansible", "PrestaShop", "AWS"];
 chips.forEach((c, i) => {
   const x = MX + i * 2.0;
   s.addShape(pres.ShapeType.roundRect, {
-    x, y: 4.5, w: 1.8, h: 0.45, fill: { color: INK_SOFT }, line: { color: "35475A", width: 0.75 }, rectRadius: 0.08,
+    x, y: 4.2, w: 1.8, h: 0.45, fill: { color: INK_SOFT }, line: { color: "35475A", width: 0.75 }, rectRadius: 0.08,
   });
-  s.addText(c, { x, y: 4.5, w: 1.8, h: 0.45, isTextBox: true, margin: 0, fontFace: M, fontSize: 12, color: "C9D6E2", align: "center", valign: "middle" });
+  s.addText(c, { x, y: 4.2, w: 1.8, h: 0.45, isTextBox: true, margin: 0, fontFace: M, fontSize: 12, color: "C9D6E2", align: "center", valign: "middle" });
 });
 s.addText("Prénom 1  ·  Prénom 2  ·  Prénom 3", {
-  x: MX, y: 5.5, w: CW, h: 0.35, isTextBox: true, margin: 0, fontFace: B, fontSize: 16, color: PAPER,
+  x: MX, y: 5.25, w: CW, h: 0.35, isTextBox: true, margin: 0, fontFace: B, fontSize: 16, color: PAPER,
 });
-s.addText("En ligne sur un vrai compte AWS, région Paris", {
-  x: MX, y: 5.9, w: CW, h: 0.3, isTextBox: true, margin: 0, fontFace: B, fontSize: 13, color: "7A8C9E",
+s.addText("Déployé sur un compte AWS, région eu-west-3 (Paris)", {
+  x: MX, y: 5.68, w: CW, h: 0.3, isTextBox: true, margin: 0, fontFace: B, fontSize: 13, color: "7A8C9E",
 });
-s.addNotes(`Bonjour à tous. On est l'agence 5HASH, et Taylor Shift nous a confié sa boutique de billets.
+s.addNotes(`Bonjour. Nous sommes l'agence 5HASH. Taylor Shift nous a confié l'infrastructure de sa boutique de billets.
 
-Le site, il existe déjà : c'est PrestaShop. Nous, on ne touche pas au site. Notre travail, c'est de lui construire une maison — et surtout une maison qui tient debout le jour où des milliers de fans se connectent en même temps.
+L'application existe déjà : c'est PrestaShop, l'image publiée sur Docker Hub. Nous ne touchons pas au code du site. Notre travail, c'est de l'héberger, de le configurer, et de faire en sorte qu'il tienne le jour de l'ouverture des ventes.
 
-Tout est écrit en code : Terraform pour construire, Ansible pour installer. Et ce n'est pas une maquette : ça tourne en ce moment sur un vrai compte AWS. On vous le montrera à la fin.`);
+Nous avons utilisé deux outils : Terraform pour créer l'infrastructure, Ansible pour configurer les serveurs. Tout est déployé sur un compte AWS réel, en région Paris. Nous ferons une démonstration à la fin.`);
 
 // ===========================================================================
-// 2 - trois questions
+// 2 - les trois questions
 // ===========================================================================
 s = pres.addSlide();
-titleSlide(s, "01 — LE BESOIN", "On s'est posé trois questions simples");
+titleSlide(s, "01 — LE BESOIN", "Trois questions au départ");
 const qs = [
-  ["1", "Comment un client arrive\njusqu'à la boutique ?", "Une seule porte ouverte sur Internet. Tout le reste est caché derrière."],
-  ["2", "Et si dix fois plus\nde monde arrive ?", "Nos serveurs ne gardent rien. Donc en ajouter, c'est changer un chiffre."],
-  ["3", "Et si une machine\ntombe en panne ?", "On l'a mesuré : le client ne voit rien, et son panier est conservé."],
+  ["1", "Par où passent\nles requêtes ?", "Un seul point d'entrée public. Les serveurs et la base sont dans des réseaux privés."],
+  ["2", "Comment absorber\nun pic de trafic ?", "Les serveurs ne stockent aucune donnée. On peut donc en ajouter à la demande."],
+  ["3", "Que se passe-t-il\nen cas de panne ?", "Le load balancer retire le serveur en panne. Les autres continuent de répondre."],
 ];
 qs.forEach((q, i) => {
   const x = MX + i * 4.12;
@@ -131,126 +131,132 @@ qs.forEach((q, i) => {
   s.addText(q[1], { x: x + 0.3, y: 2.68, w: 3.25, h: 0.95, isTextBox: true, margin: 0, fontFace: H, fontSize: 16, bold: true, color: TEXT, lineSpacing: 22 });
   s.addText(q[2], { x: x + 0.3, y: 3.72, w: 3.25, h: 0.95, isTextBox: true, margin: 0, fontFace: B, fontSize: 13.5, color: MUTED });
 });
-keyLine(s, "Chaque choix qu'on va vous présenter répond à l'une de ces trois questions.", 5.25);
-s.addNotes(`Avant de choisir la moindre technologie, on s'est posé trois questions toutes bêtes.
+keyLine(s, "Chaque choix présenté ensuite répond à l'une de ces trois questions.", 5.25);
+s.addNotes(`Avant de choisir les technologies, nous avons posé trois questions.
 
-Un : comment un client arrive jusqu'à la boutique ? Autrement dit, par où ça rentre, et qu'est-ce qu'on laisse ouvert.
+Première question : par où passent les requêtes ? C'est la question du réseau et de la sécurité. Notre réponse : un seul point d'entrée public, et tout le reste dans des réseaux privés.
 
-Deux : et si dix fois plus de monde arrive d'un coup ? Parce qu'une ouverture de billetterie, ce n'est pas un trafic régulier. C'est un mur.
+Deuxième question : comment absorber un pic de trafic ? Une ouverture de billetterie, c'est un pic, pas une charge régulière. Notre réponse : les serveurs ne stockent aucune donnée, donc on peut en ajouter à la demande.
 
-Trois : et si une machine tombe ? Parce qu'une machine finit toujours par tomber.
+Troisième question : que se passe-t-il en cas de panne ? Notre réponse : le load balancer retire automatiquement le serveur en panne, et les autres continuent.
 
-Tout ce qu'on va vous montrer répond à l'une de ces trois questions.`);
+Chaque choix que nous présentons ensuite répond à l'une de ces trois questions.`);
 
 // ===========================================================================
 // 3 - architecture
 // ===========================================================================
 s = pres.addSlide();
-titleSlide(s, "02 — L'ARCHITECTURE", "Une entrée, des caisses, un coffre");
+titleSlide(s, "02 — ARCHITECTURE", "Trois niveaux de réseau, deux zones de disponibilité");
 
-const dTop = 1.72, dLeft = 1.55, dW = 11.1;
+const dTop = 1.72, dLeft = 1.75, dW = 10.9;
 const bands = [
-  ["CÔTÉ RUE\n(public)", dTop + 0.42, 1.15],
-  ["LES CAISSES\n(privé)", dTop + 1.95, 1.15],
-  ["LES RÉSERVES\n(privé)", dTop + 3.45, 1.3],
+  ["RÉSEAU\nPUBLIC", dTop + 0.42, 1.15],
+  ["RÉSEAU PRIVÉ\nAPPLICATION", dTop + 1.95, 1.15],
+  ["RÉSEAU PRIVÉ\nDONNÉES", dTop + 3.45, 1.3],
 ];
 bands.forEach(([label, y, h]) => {
   s.addShape(pres.ShapeType.roundRect, { x: dLeft, y, w: dW, h, fill: { color: WASH }, line: { color: LINE, width: 0.75 }, rectRadius: 0.03 });
-  s.addText(label, { x: MX - 0.05, y: y + h / 2 - 0.3, w: 0.95, h: 0.6, isTextBox: true, margin: 0, fontFace: M, fontSize: 8.5, color: MUTED, align: "right", valign: "middle" });
+  s.addText(label, { x: MX - 0.05, y: y + h / 2 - 0.3, w: 1.15, h: 0.6, isTextBox: true, margin: 0, fontFace: M, fontSize: 8.5, color: MUTED, align: "right", valign: "middle" });
 });
-s.addText("LES CLIENTS", { x: dLeft + 0.3, y: dTop - 0.02, w: 2.0, h: 0.3, isTextBox: true, margin: 0, fontFace: M, fontSize: 10, color: MUTED });
+s.addText("INTERNET", { x: dLeft + 0.3, y: dTop - 0.02, w: 2.0, h: 0.3, isTextBox: true, margin: 0, fontFace: M, fontSize: 10, color: MUTED });
 s.addShape(pres.ShapeType.line, { x: dLeft + 0.75, y: dTop + 0.26, w: 0, h: 0.16, line: { color: AMBER, width: 1.5 } });
-s.addText("le site", { x: dLeft + 0.95, y: dTop + 0.18, w: 1.2, h: 0.25, isTextBox: true, margin: 0, fontFace: M, fontSize: 8.5, color: AMBER_DK });
-s.addShape(pres.ShapeType.line, { x: dLeft + 8.6, y: dTop + 0.26, w: 0, h: 0.16, line: { color: MUTED, width: 1.25, dashType: "dash" } });
-s.addText("nous, pour installer", { x: dLeft + 8.8, y: dTop + 0.18, w: 2.4, h: 0.25, isTextBox: true, margin: 0, fontFace: M, fontSize: 8.5, color: MUTED });
+s.addText("clients · HTTP", { x: dLeft + 0.95, y: dTop + 0.18, w: 1.6, h: 0.25, isTextBox: true, margin: 0, fontFace: M, fontSize: 8.5, color: AMBER_DK });
+s.addShape(pres.ShapeType.line, { x: dLeft + 8.4, y: dTop + 0.26, w: 0, h: 0.16, line: { color: MUTED, width: 1.25, dashType: "dash" } });
+s.addText("administration · SSH, notre IP", { x: dLeft + 8.6, y: dTop + 0.18, w: 2.6, h: 0.25, isTextBox: true, margin: 0, fontFace: M, fontSize: 8.5, color: MUTED });
 
-card(s, { x: dLeft + 0.28, y: dTop + 0.58, w: 5.1, h: 0.82, fill: PAPER, line: AMBER });
-s.addText("Le répartiteur  (load balancer)", { x: dLeft + 0.45, y: dTop + 0.68, w: 4.8, h: 0.3, isTextBox: true, margin: 0, fontFace: H, fontSize: 13, bold: true, color: TEXT });
-s.addText("il envoie chaque visiteur vers une caisse qui va bien", { x: dLeft + 0.45, y: dTop + 1.0, w: 4.8, h: 0.3, isTextBox: true, margin: 0, fontFace: B, fontSize: 11, color: MUTED });
+card(s, { x: dLeft + 0.28, y: dTop + 0.58, w: 5.0, h: 0.82, fill: PAPER, line: AMBER });
+s.addText("Load balancer", { x: dLeft + 0.45, y: dTop + 0.68, w: 4.7, h: 0.3, isTextBox: true, margin: 0, fontFace: H, fontSize: 13.5, bold: true, color: TEXT });
+s.addText("répartit les requêtes · vérifie chaque serveur toutes les 15 s", { x: dLeft + 0.45, y: dTop + 1.0, w: 4.7, h: 0.3, isTextBox: true, margin: 0, fontFace: B, fontSize: 11, color: MUTED });
 
-card(s, { x: dLeft + 7.6, y: dTop + 0.58, w: 3.2, h: 0.82, fill: PAPER, line: "B4C0CC" });
-s.addText("L'entrée de service", { x: dLeft + 7.78, y: dTop + 0.68, w: 2.9, h: 0.3, isTextBox: true, margin: 0, fontFace: H, fontSize: 13, bold: true, color: TEXT });
-s.addText("réservée à l'équipe, jamais aux clients", { x: dLeft + 7.78, y: dTop + 1.0, w: 2.9, h: 0.3, isTextBox: true, margin: 0, fontFace: B, fontSize: 11, color: MUTED });
+card(s, { x: dLeft + 7.4, y: dTop + 0.58, w: 3.2, h: 0.82, fill: PAPER, line: "B4C0CC" });
+s.addText("Bastion", { x: dLeft + 7.58, y: dTop + 0.68, w: 2.9, h: 0.3, isTextBox: true, margin: 0, fontFace: H, fontSize: 13.5, bold: true, color: TEXT });
+s.addText("accès SSH pour Ansible uniquement", { x: dLeft + 7.58, y: dTop + 1.0, w: 2.9, h: 0.3, isTextBox: true, margin: 0, fontFace: B, fontSize: 11, color: MUTED });
 
 s.addShape(pres.ShapeType.line, { x: dLeft + 2.4, y: dTop + 1.42, w: 0, h: 0.5, line: { color: AMBER, width: 1.75, endArrowType: "triangle" } });
-s.addShape(pres.ShapeType.line, { x: dLeft + 9.2, y: dTop + 1.42, w: 0, h: 0.5, line: { color: MUTED, width: 1.25, dashType: "dash", endArrowType: "triangle" } });
+s.addText("port 80", { x: dLeft + 2.55, y: dTop + 1.5, w: 1.1, h: 0.25, isTextBox: true, margin: 0, fontFace: M, fontSize: 9, color: AMBER_DK });
+s.addShape(pres.ShapeType.line, { x: dLeft + 9.0, y: dTop + 1.42, w: 0, h: 0.5, line: { color: MUTED, width: 1.25, dashType: "dash", endArrowType: "triangle" } });
+s.addText("port 22", { x: dLeft + 9.15, y: dTop + 1.5, w: 1.1, h: 0.25, isTextBox: true, margin: 0, fontFace: M, fontSize: 9, color: MUTED });
 
-card(s, { x: dLeft + 0.28, y: dTop + 2.12, w: 10.5, h: 0.82, fill: PAPER, line: "B4C0CC" });
-s.addText("Les caisses : des serveurs qui font tourner PrestaShop", { x: dLeft + 0.45, y: dTop + 2.2, w: 10.1, h: 0.3, isTextBox: true, margin: 0, fontFace: H, fontSize: 13, bold: true, color: TEXT });
-s.addText("toutes identiques, interchangeables — et aucune n'est joignable depuis Internet", { x: dLeft + 0.45, y: dTop + 2.52, w: 10.1, h: 0.3, isTextBox: true, margin: 0, fontFace: B, fontSize: 11, color: MUTED });
+card(s, { x: dLeft + 0.28, y: dTop + 2.12, w: 10.3, h: 0.82, fill: PAPER, line: "B4C0CC" });
+s.addText("Serveurs EC2  —  conteneur Docker PrestaShop", { x: dLeft + 0.45, y: dTop + 2.2, w: 9.9, h: 0.3, isTextBox: true, margin: 0, fontFace: H, fontSize: 13.5, bold: true, color: TEXT });
+s.addText("identiques · répartis sur les zones · aucune adresse IP publique", { x: dLeft + 0.45, y: dTop + 2.52, w: 9.9, h: 0.3, isTextBox: true, margin: 0, fontFace: B, fontSize: 11, color: MUTED });
 
 s.addShape(pres.ShapeType.line, { x: dLeft + 2.4, y: dTop + 2.96, w: 0, h: 0.46, line: { color: TEAL, width: 1.75, endArrowType: "triangle" } });
-s.addShape(pres.ShapeType.line, { x: dLeft + 8.2, y: dTop + 2.96, w: 0, h: 0.46, line: { color: TEAL, width: 1.75, endArrowType: "triangle" } });
+s.addText("port 3306", { x: dLeft + 2.55, y: dTop + 3.02, w: 1.3, h: 0.25, isTextBox: true, margin: 0, fontFace: M, fontSize: 9, color: TEAL });
+s.addShape(pres.ShapeType.line, { x: dLeft + 8.0, y: dTop + 2.96, w: 0, h: 0.46, line: { color: TEAL, width: 1.75, endArrowType: "triangle" } });
+s.addText("port 2049", { x: dLeft + 8.15, y: dTop + 3.02, w: 1.3, h: 0.25, isTextBox: true, margin: 0, fontFace: M, fontSize: 9, color: TEAL });
 
-card(s, { x: dLeft + 0.28, y: dTop + 3.62, w: 5.1, h: 0.96, fill: PAPER, line: TEAL });
-s.addText("Le coffre : la base de données", { x: dLeft + 0.45, y: dTop + 3.72, w: 4.8, h: 0.3, isTextBox: true, margin: 0, fontFace: H, fontSize: 13, bold: true, color: TEXT });
-s.addText("les billets, les paniers, les commandes", { x: dLeft + 0.45, y: dTop + 4.06, w: 4.8, h: 0.35, isTextBox: true, margin: 0, fontFace: B, fontSize: 11, color: MUTED });
+card(s, { x: dLeft + 0.28, y: dTop + 3.62, w: 5.0, h: 0.96, fill: PAPER, line: TEAL });
+s.addText("Base de données RDS MySQL", { x: dLeft + 0.45, y: dTop + 3.72, w: 4.7, h: 0.3, isTextBox: true, margin: 0, fontFace: H, fontSize: 13.5, bold: true, color: TEXT });
+s.addText("catalogue, paniers, commandes", { x: dLeft + 0.45, y: dTop + 4.06, w: 4.7, h: 0.35, isTextBox: true, margin: 0, fontFace: B, fontSize: 11, color: MUTED });
 
-card(s, { x: dLeft + 5.7, y: dTop + 3.62, w: 5.1, h: 0.96, fill: PAPER, line: TEAL });
-s.addText("Le vestiaire : un disque partagé", { x: dLeft + 5.88, y: dTop + 3.72, w: 4.8, h: 0.3, isTextBox: true, margin: 0, fontFace: H, fontSize: 13, bold: true, color: TEXT });
-s.addText("les images, le thème, et les paniers en cours", { x: dLeft + 5.88, y: dTop + 4.06, w: 4.8, h: 0.35, isTextBox: true, margin: 0, fontFace: B, fontSize: 11, color: MUTED });
+card(s, { x: dLeft + 5.6, y: dTop + 3.62, w: 5.0, h: 0.96, fill: PAPER, line: TEAL });
+s.addText("Disque partagé EFS", { x: dLeft + 5.78, y: dTop + 3.72, w: 4.7, h: 0.3, isTextBox: true, margin: 0, fontFace: H, fontSize: 13.5, bold: true, color: TEXT });
+s.addText("images, thème, sessions PHP", { x: dLeft + 5.78, y: dTop + 4.06, w: 4.7, h: 0.35, isTextBox: true, margin: 0, fontFace: B, fontSize: 11, color: MUTED });
 
-keyLine(s, "Les caisses ne gardent rien : tout est dans le coffre et le vestiaire. C'est ce qui rend tout le reste possible.", 6.6);
-s.addNotes(`Pour expliquer l'architecture, on va prendre l'image d'une salle de concert. Ça se lit de haut en bas, comme le trajet d'un client.
+keyLine(s, "Les serveurs ne stockent aucune donnée : tout est dans la base ou sur le disque partagé.", 6.6);
+s.addNotes(`Voici l'architecture. Elle se lit de haut en bas, dans le sens d'une requête.
 
-En haut, côté rue, il y a UNE seule porte : le répartiteur. C'est l'hôte d'accueil. Il envoie chaque visiteur vers une caisse libre, et il vérifie toutes les quinze secondes que chaque caisse va bien. Si une caisse ne répond plus, il arrête d'y envoyer du monde.
+Premier niveau, le réseau public. Il contient deux choses. Le load balancer, qui est le seul point d'entrée des clients : il répartit les requêtes entre les serveurs et vérifie leur état toutes les quinze secondes. Et le bastion, qui sert uniquement à notre accès SSH : il est ouvert à une seule adresse IP, la nôtre. Aucun client ne passe par le bastion.
 
-À côté, l'entrée de service. Elle, elle est réservée à l'équipe : c'est par là qu'on passe pour installer et dépanner. Elle est ouverte à une seule adresse, la nôtre. Aucun client ne passe par là.
+Deuxième niveau, le réseau privé applicatif. Il contient les serveurs EC2, avec le conteneur PrestaShop. Ils sont identiques entre eux, répartis sur les deux zones de disponibilité, et ils n'ont aucune adresse IP publique : on ne peut les joindre qu'à travers le load balancer.
 
-Au milieu, les caisses : ce sont les serveurs qui font tourner la boutique. Elles sont toutes identiques. Et surtout, elles ne sont pas joignables depuis Internet — on ne peut y arriver qu'en passant par la porte d'accueil.
+Troisième niveau, le réseau privé des données. La base MySQL d'un côté, le disque partagé de l'autre. Ce niveau n'a aucune route vers Internet.
 
-En bas, les réserves. Le coffre, c'est la base de données : les billets, les paniers, les commandes. Le vestiaire, c'est un disque partagé : les images du site, le thème, et les paniers en cours.
-
-Et voilà le point important : les caisses ne gardent rien. Tout est dans le coffre et dans le vestiaire. C'est exactement ce qui va nous permettre d'en ajouter ou d'en perdre sans que personne ne s'en aperçoive.`);
+Le point à retenir : les serveurs ne stockent aucune donnée. Le catalogue et les commandes sont dans la base, les images et les sessions sur le disque partagé. C'est ce qui permet d'ajouter ou de perdre un serveur sans conséquence.`);
 
 // ===========================================================================
-// 4 - qui fait quoi
+// 4 - choix
 // ===========================================================================
 s = pres.addSlide();
 titleSlide(s, "03 — NOS CHOIX", "Ce qu'on gère, ce qu'on laisse à AWS");
-s.addText("La règle qu'on s'est donnée : on garde la main sur ce qui est propre à la boutique, et on laisse à AWS ce que personne n'a envie de réparer un soir d'ouverture.", {
+s.addText("Le sujet nous laissait libres de répartir. Nous avons gardé ce qui est propre à la boutique, et confié à AWS ce qui est standard.", {
   x: MX, y: 1.6, w: 11.8, h: 0.45, isTextBox: true, margin: 0, fontFace: B, fontSize: 14, color: MUTED,
 });
 const rows = [
-  [{ text: "QUOI", options: { bold: true } }, { text: "NOTRE CHOIX", options: { bold: true } }, { text: "POURQUOI", options: { bold: true } }],
-  ["La boutique", "Docker sur un serveur EC2", "Le sujet demande l'image PrestaShop sur EC2. Changer de version, c'est une ligne à modifier."],
-  ["La base de données", "RDS, le service géré d'AWS", "Sauvegardes, mises à jour, machine de secours : AWS le fait mieux que nous, et sans nous réveiller la nuit."],
-  ["Les fichiers", "EFS, un disque partagé", "Plusieurs serveurs doivent voir les mêmes images. Un disque normal ne se partage pas."],
-  ["L'entrée", "Un load balancer", "Il surveille les serveurs et répartit les visiteurs tout seul."],
-  ["Les mots de passe", "Coffre AWS + Ansible Vault", "Le mot de passe de la base n'est écrit nulle part : chaque serveur va le chercher lui-même."],
-  ["Notre accès", "Un serveur d'entrée dédié", "Une seule porte pour l'équipe, ouverte à une seule adresse IP."],
+  [{ text: "COMPOSANT", options: { bold: true } }, { text: "CHOIX", options: { bold: true } }, { text: "RAISON", options: { bold: true } }],
+  ["Application", "Docker sur EC2", "Le sujet impose l'image PrestaShop sur une instance EC2 configurée par Ansible. Changer de version se fait en une ligne."],
+  ["Base de données", "RDS MySQL (managé)", "AWS gère les sauvegardes, les mises à jour et le basculement automatique vers une instance de secours."],
+  ["Fichiers", "EFS (disque partagé)", "Plusieurs serveurs doivent lire et écrire les mêmes fichiers. Un disque EBS ne se partage pas."],
+  ["Point d'entrée", "Load balancer (ALB)", "Il surveille l'état des serveurs et répartit les requêtes entre les zones."],
+  ["Secrets", "Secrets Manager + Vault", "Le mot de passe de la base n'est pas dans le dépôt. Chaque serveur le lit avec son rôle IAM."],
+  ["Accès administration", "Bastion SSH", "Les serveurs n'ont pas d'adresse publique. Un seul point d'accès, limité à notre IP."],
 ];
 s.addTable(rows, {
-  x: MX, y: 2.2, w: CW, colW: [2.2, 2.7, 7.19],
+  x: MX, y: 2.2, w: CW, colW: [2.3, 2.7, 7.09],
   fontFace: B, fontSize: 12.5, color: TEXT, valign: "top",
   border: { type: "solid", pt: 0.5, color: LINE },
   fill: { color: PAPER }, rowH: 0.62,
 });
-s.addNotes(`Le sujet nous laissait libres : ce qui tourne sur nos serveurs, et ce qu'on confie à AWS. Voilà comment on a tranché.
+s.addNotes(`Le sujet nous laissait libres de choisir ce qui tourne sur EC2 et ce qu'on confie à un service managé. Voici nos choix.
 
-La boutique tourne dans un conteneur Docker, sur un serveur EC2. C'est ce que demande le sujet, et ça nous arrange : changer de version de PrestaShop, c'est une seule ligne à modifier.
+L'application tourne dans un conteneur Docker sur une instance EC2. C'est ce que demande le sujet. Le conteneur donne un environnement identique partout, et changer de version de PrestaShop revient à modifier une ligne.
 
-La base de données, par contre, on ne veut pas la gérer. AWS s'occupe des sauvegardes, des mises à jour, et garde une machine de secours prête à prendre le relais. Franchement, personne n'a envie de découvrir un problème de base de données le soir de l'ouverture des ventes.
+La base de données est managée, c'est RDS. AWS gère les sauvegardes automatiques, les mises à jour de sécurité, et le basculement vers une instance de secours. Nous n'avons pas voulu réécrire ça nous-mêmes.
 
-Pour les fichiers, il nous fallait un disque que plusieurs serveurs voient en même temps. Un disque classique ne se partage pas. EFS, si.
+Pour les fichiers, il fallait un stockage que plusieurs serveurs lisent et écrivent en même temps. Un disque EBS ne se partage pas entre instances, EFS si.
 
-Et les mots de passe : celui de la base n'est écrit nulle part dans notre code. Terraform le génère, le dépose dans le coffre d'AWS, et chaque serveur va le chercher tout seul avec sa propre autorisation. Dans le dépôt, il n'y a que le mot de passe de l'administration du site, et il est chiffré.`);
+Pour le point d'entrée, le load balancer surveille les serveurs et répartit les requêtes entre les deux zones.
+
+Pour les secrets, le mot de passe de la base est généré par Terraform et déposé dans Secrets Manager. Il n'est pas dans le dépôt. Chaque serveur va le chercher avec son propre rôle IAM. Seuls les identifiants du back-office sont dans le dépôt, et ils sont chiffrés avec Ansible Vault.
+
+Enfin, les serveurs n'ont pas d'adresse publique. L'accès administration passe par un bastion, ouvert à notre seule adresse IP.`);
 
 // ===========================================================================
 // 5 - terraform
 // ===========================================================================
 s = pres.addSlide();
-titleSlide(s, "04 — TERRAFORM", "On décrit ce qu'on veut, Terraform le construit");
-s.addText("Six briques, une par couche. On les assemble, et la même description donne un petit environnement de test ou une vraie production.", {
+titleSlide(s, "04 — TERRAFORM", "Terraform crée l'infrastructure");
+s.addText("Le code est découpé en six modules, un par couche. Chaque module a ses variables et ses sorties, et peut être relu séparément.", {
   x: MX, y: 1.58, w: 11.8, h: 0.45, isTextBox: true, margin: 0, fontFace: B, fontSize: 14, color: MUTED,
 });
 const mods = [
-  ["network", "le réseau et ses trois niveaux"],
-  ["security", "qui a le droit de parler à qui"],
-  ["storage", "le disque partagé"],
-  ["database", "la base de données"],
-  ["compute", "les serveurs"],
-  ["loadbalancer", "l'entrée et la surveillance"],
+  ["network", "VPC, sous-réseaux, NAT, routes"],
+  ["security", "groupes de sécurité"],
+  ["storage", "disque partagé EFS"],
+  ["database", "RDS MySQL, Secrets Manager"],
+  ["compute", "instances EC2, bastion, rôle IAM"],
+  ["loadbalancer", "ALB, alarmes CloudWatch"],
 ];
 mods.forEach((m, i) => {
   const y = 2.2 + i * 0.52;
@@ -259,9 +265,9 @@ mods.forEach((m, i) => {
   s.addText(m[1], { x: MX + 2.0, y, w: 4.3, h: 0.4, isTextBox: true, margin: 0, fontFace: B, fontSize: 12.5, color: MUTED });
 });
 const tcards = [
-  ["Trois environnements, un seul code", "Test, pré-production, production : on change un mot, pas le code. Le test a 1 serveur, la production en a 3 répartis sur 3 zones."],
-  ["Le travail à trois est protégé", "La description de l'infrastructure est stockée sur AWS, verrouillée : deux personnes ne peuvent pas la modifier en même temps."],
-  ["Rien n'est écrit en dur", "Terraform va chercher lui-même l'image système, les zones disponibles, et même notre adresse IP — celle qui aura le droit de se connecter."],
+  ["Trois environnements, un seul code", "dev, staging et prod utilisent le même code. Une table de variables définit les tailles : 1 serveur en dev, 3 serveurs sur 3 zones en prod."],
+  ["État distant et verrouillage", "L'état Terraform est dans un bucket S3 versionné et chiffré, avec un verrou. Deux personnes ne peuvent pas modifier en même temps."],
+  ["Valeurs résolues automatiquement", "L'AMI Ubuntu, la liste des zones et notre adresse IP publique sont lues à l'exécution, pas écrites en dur dans le code."],
 ];
 tcards.forEach((c, i) => {
   const y = 2.2 + i * 1.33;
@@ -269,142 +275,144 @@ tcards.forEach((c, i) => {
   s.addText(c[0], { x: 7.25, y: y + 0.12, w: 5.3, h: 0.3, isTextBox: true, margin: 0, fontFace: H, fontSize: 13, bold: true, color: TEXT });
   s.addText(c[1], { x: 7.25, y: y + 0.44, w: 5.3, h: 0.72, isTextBox: true, margin: 0, fontFace: B, fontSize: 11.5, color: MUTED });
 });
-s.addNotes(`Terraform, c'est l'outil qui construit. On lui décrit ce qu'on veut, il se débrouille pour le créer.
+s.addNotes(`Terraform crée l'infrastructure. On décrit les ressources voulues, Terraform les crée et retient ce qu'il a créé.
 
-On a découpé en six briques, une par couche : le réseau, les droits, le disque, la base, les serveurs, et l'entrée. Chaque brique se relit toute seule, et si on veut en changer une, on ne casse pas les autres.
+Nous avons découpé le code en six modules, un par couche : le réseau, les groupes de sécurité, le stockage, la base, les instances et le load balancer. Chaque module a ses variables documentées et ses sorties. On peut en relire un sans lire les autres.
 
-Le truc dont on est contents : les trois environnements. Test, pré-production, production. C'est exactement le même code. On change un mot, et on passe d'un serveur à trois serveurs répartis sur trois zones, avec une base qui a une machine de secours et deux semaines de sauvegardes.
+Pour les environnements, nous avons dev, staging et prod. C'est le même code. Une table de variables définit les tailles : en dev, un serveur et une base simple ; en prod, trois serveurs sur trois zones, une base avec instance de secours, et quatorze jours de sauvegardes. On change une variable, pas le code.
 
-La description de l'infrastructure est stockée sur AWS, pas sur nos ordinateurs, et elle est verrouillée : à trois, on ne peut pas se marcher dessus.
+L'état Terraform, c'est-à-dire la liste de ce qui a été créé, est stocké dans un bucket S3 versionné et chiffré, avec un verrou. C'est nécessaire à trois : sans ça, deux personnes peuvent modifier l'infrastructure en même temps.
 
-Et rien n'est écrit en dur. Terraform va même chercher notre adresse IP du moment, et c'est la seule qui aura le droit de se connecter aux serveurs.`);
+Enfin, trois valeurs sont lues automatiquement à l'exécution : l'identifiant de l'image Ubuntu, la liste des zones disponibles, et notre adresse IP publique. Cette dernière sert à autoriser l'accès SSH au bastion.`);
 
 // ===========================================================================
 // 6 - ansible
 // ===========================================================================
 s = pres.addSlide();
-titleSlide(s, "05 — ANSIBLE", "Ansible lit les adresses chez Terraform");
-s.addText("Terraform connaît déjà les adresses des serveurs. Plutôt que de les recopier à la main, Ansible va les lire chez lui.", {
+titleSlide(s, "05 — ANSIBLE", "Ansible configure les serveurs");
+s.addText("Terraform connaît les adresses des serveurs. Ansible les lit directement dans l'état Terraform, au lieu qu'on les recopie.", {
   x: MX, y: 1.58, w: 11.8, h: 0.4, isTextBox: true, margin: 0, fontFace: B, fontSize: 14, color: MUTED,
 });
 code(s, [
-  "# Terraform écrit la liste des serveurs…",
+  "# Terraform déclare les serveurs et leurs informations",
   'resource "ansible_host" "app" {',
   '  name      = "taylorshift-dev-app-1"',
   '  groups    = ["prestashop"]',
   '  variables = { ansible_host = ..., db_host = ... }',
   "}",
   "",
-  "# …et Ansible la relit. C'est tout.",
+  "# Ansible les lit depuis l'état Terraform",
   "plugin: cloud.terraform.terraform_provider",
-], { x: MX, y: 2.12, w: 7.15, h: 2.5, size: 11.5 });
+], { x: MX, y: 2.1, w: 7.15, h: 2.5, size: 11.5 });
 
 const acards = [
-  ["Des rôles qu'on réutilise", "Le serveur d'entrée et les caisses partagent le même rôle de base, avec des réglages différents. Docker vient d'un rôle public, installé depuis Galaxy."],
-  ["Les secrets sont chiffrés", "Le mot de passe de l'administration est chiffré dans le dépôt. Celui de la base n'y est même pas."],
-  ["On peut le relancer sans risque", "Ansible décrit l'état voulu, pas des étapes. Si tout est déjà en place, il ne touche à rien."],
+  ["Trois rôles réutilisables", "common, efs et prestashop. Le bastion et les serveurs applicatifs utilisent le même rôle common avec des variables différentes. Docker vient d'un rôle Ansible Galaxy."],
+  ["Secrets protégés", "Les identifiants du back-office sont chiffrés avec Ansible Vault. Le mot de passe de la base n'est pas dans le dépôt."],
+  ["Playbook idempotent", "Le playbook décrit l'état voulu. Si l'état est déjà atteint, il ne modifie rien."],
 ];
 acards.forEach((c, i) => {
-  const y = 2.12 + i * 1.5;
+  const y = 2.1 + i * 1.5;
   card(s, { x: 8.05, y, w: 4.66, h: 1.35 });
   s.addText(c[0], { x: 8.25, y: y + 0.13, w: 4.3, h: 0.3, isTextBox: true, margin: 0, fontFace: H, fontSize: 13, bold: true, color: TEXT });
   s.addText(c[1], { x: 8.25, y: y + 0.46, w: 4.3, h: 0.85, isTextBox: true, margin: 0, fontFace: B, fontSize: 11, color: MUTED });
 });
 s.addShape(pres.ShapeType.roundRect, { x: MX, y: 4.85, w: 7.15, h: 1.0, fill: { color: "E8F3EC" }, line: { color: OK, width: 0.75 }, rectRadius: 0.05 });
-s.addText("On relance : « changed=0 »", {
+s.addText("Deuxième exécution : changed=0", {
   x: MX + 0.25, y: 4.98, w: 6.7, h: 0.35, isTextBox: true, margin: 0, fontFace: H, fontSize: 16, bold: true, color: OK,
 });
-s.addText("Zéro modification. La machine était déjà dans l'état demandé.", {
+s.addText("Aucune modification. Les serveurs sont déjà dans l'état décrit.", {
   x: MX + 0.25, y: 5.36, w: 6.7, h: 0.35, isTextBox: true, margin: 0, fontFace: B, fontSize: 12.5, color: MUTED,
 });
-s.addNotes(`Ansible, c'est l'outil qui installe. Une fois que Terraform a construit les machines, Ansible les configure.
+s.addNotes(`Ansible configure les serveurs créés par Terraform : il installe Docker, monte le disque partagé, récupère le mot de passe de la base et démarre le conteneur PrestaShop.
 
-Le problème classique, c'est de faire le lien entre les deux : Terraform crée un serveur, et il faut donner son adresse à Ansible. Beaucoup de gens recopient à la main. Nous, non.
+Le point d'intégration entre les deux outils est ici. Terraform connaît les adresses des serveurs. Plutôt que de les recopier dans un fichier d'inventaire, Terraform les déclare dans son état, et Ansible les lit depuis cet état avec un plugin d'inventaire dynamique.
 
-Terraform écrit la liste des serveurs dans sa propre description, et Ansible va la lire directement chez lui. Résultat : il n'y a pas une seule adresse IP écrite à la main dans tout le projet. On crée un serveur avec Terraform, il apparaît tout seul dans la liste d'Ansible.
+Conséquence : il n'y a aucune adresse IP écrite à la main dans le projet. Quand on ajoute un serveur avec Terraform, il apparaît automatiquement dans l'inventaire Ansible.
 
-On a écrit trois rôles réutilisables. Le serveur d'entrée et les caisses partagent le même rôle de base, juste avec des réglages différents. Et pour Docker, on a pris un rôle public, installé depuis Ansible Galaxy, plutôt que de le réécrire.
+Nous avons écrit trois rôles réutilisables : common, efs et prestashop. Le bastion et les serveurs applicatifs utilisent le même rôle common, avec des variables différentes. Pour Docker, nous avons utilisé un rôle existant d'Ansible Galaxy plutôt que de le réécrire.
 
-Et le point le plus important, celui du barème : on peut relancer l'installation autant de fois qu'on veut. La deuxième fois, Ansible affiche « changed égale zéro ». Il ne touche à rien, parce que tout est déjà comme demandé. Ce n'est pas de la chance : on a conçu l'installation pour ça.`);
+Les identifiants du back-office sont chiffrés avec Ansible Vault. Le mot de passe de la base n'est pas dans le dépôt du tout.
+
+Enfin, le playbook est idempotent : il décrit l'état voulu, pas une suite d'étapes. À la deuxième exécution, il affiche changed égale zéro : il ne modifie rien, parce que tout est déjà en place.`);
 
 // ===========================================================================
-// 7 - affluence
+// 7 - montee en charge
 // ===========================================================================
 s = pres.addSlide();
-titleSlide(s, "06 — LE JOUR DE L'OUVERTURE", "Plus de monde ? On change un chiffre");
-s.addText("Aucune commande, aucune image, aucun panier ne vit sur un serveur : tout est dans la base et sur le disque partagé. Du coup, ajouter un serveur ne dérange pas ceux qui travaillent déjà.", {
-  x: MX, y: 1.6, w: 11.8, h: 0.5, isTextBox: true, margin: 0, fontFace: B, fontSize: 14, color: MUTED,
+titleSlide(s, "06 — MONTÉE EN CHARGE", "Ajouter des serveurs = modifier une variable");
+s.addText("Les serveurs ne stockent aucune donnée. On peut donc en ajouter sans interrompre ceux qui répondent déjà.", {
+  x: MX, y: 1.6, w: 11.8, h: 0.4, isTextBox: true, margin: 0, fontFace: B, fontSize: 14, color: MUTED,
 });
 code(s, [
-  "terraform apply -var app_instance_count=6      # on passe de 1 à 6 serveurs",
-  "ansible-playbook ... site.yml                  # on les installe",
+  "terraform apply -var app_instance_count=6     # crée les serveurs",
+  "ansible-playbook ... site.yml                 # les configure",
   "",
-  "# environ 3 minutes, sans couper la boutique",
-], { x: MX, y: 2.35, w: 12.09, h: 1.35, size: 12.5, dark: true });
+  "# environ 3 minutes, sans interruption de service",
+], { x: MX, y: 2.3, w: 12.09, h: 1.35, size: 12.5, dark: true });
 
 const alarms = [
-  ["Le site devient lent", "Plus de 2 secondes de réponse pendant 3 minutes : la flotte sature, il faut ajouter des serveurs."],
-  ["Un serveur ne répond plus", "Il est sorti tout seul de la rotation. On va voir pourquoi avant qu'il y en ait deux."],
-  ["Le site renvoie des erreurs", "Plus de 10 erreurs par minute : la boutique répond, mais mal."],
+  ["Temps de réponse > 2 s", "Moyenne sur 3 minutes. Signifie que les serveurs saturent : il faut en ajouter."],
+  ["Serveur hors rotation", "Le load balancer a retiré un serveur. Il faut comprendre pourquoi."],
+  ["Plus de 10 erreurs 5xx / min", "Les serveurs répondent, mais renvoient des erreurs."],
 ];
 alarms.forEach((a, i) => {
   const x = MX + i * 4.12;
   card(s, { x, y: 4.0, w: 3.85, h: 1.85 });
-  s.addText("AWS NOUS PRÉVIENT SI…", { x: x + 0.25, y: 4.15, w: 3.4, h: 0.25, isTextBox: true, margin: 0, fontFace: M, fontSize: 9, color: AMBER_DK, charSpacing: 1 });
+  s.addText("ALARME CLOUDWATCH", { x: x + 0.25, y: 4.15, w: 3.4, h: 0.25, isTextBox: true, margin: 0, fontFace: M, fontSize: 9, color: AMBER_DK, charSpacing: 1 });
   s.addText(a[0], { x: x + 0.25, y: 4.45, w: 3.4, h: 0.35, isTextBox: true, margin: 0, fontFace: H, fontSize: 14, bold: true, color: TEXT });
   s.addText(a[1], { x: x + 0.25, y: 4.88, w: 3.4, h: 0.85, isTextBox: true, margin: 0, fontFace: B, fontSize: 11.5, color: MUTED });
 });
-s.addNotes(`On arrive à la question qui compte vraiment : le jour où les billets partent en vente.
+s.addNotes(`Voici comment nous répondons à un pic de trafic.
 
-Nos serveurs ne gardent rien. Une commande va dans la base, une image sur le disque partagé, un panier aussi. Résultat : ajouter de la capacité, c'est littéralement changer un chiffre.
+Les serveurs ne stockent aucune donnée : les commandes sont dans la base, les images et les sessions sur le disque partagé. Ajouter de la capacité revient donc à modifier une variable.
 
-Deux commandes. La première crée les serveurs et les répartit sur les zones. La deuxième les installe — et seulement eux, parce qu'Ansible ne touche pas à ceux qui travaillent déjà. Trois minutes, sans couper la boutique.
+Deux commandes. La première, Terraform, crée les serveurs, les répartit sur les zones et les enregistre auprès du load balancer. La deuxième, Ansible, les configure. Comme le playbook est idempotent, il ne touche pas aux serveurs déjà en service. L'opération prend environ trois minutes, sans interruption.
 
-Et on ne décide pas au hasard. AWS surveille trois choses pour nous et nous envoie un mail : si le site devient lent, si un serveur ne répond plus, ou si la boutique renvoie des erreurs. C'est ça qui nous dit quand ajouter des machines.`);
+Pour savoir quand le faire, trois alarmes CloudWatch sont créées avec le load balancer. La première surveille le temps de réponse : au-delà de deux secondes en moyenne sur trois minutes, les serveurs saturent. La deuxième compte les serveurs retirés de la rotation. La troisième compte les erreurs serveur. Les trois notifient une adresse mail.`);
 
 // ===========================================================================
 // 8 - pannes
 // ===========================================================================
 s = pres.addSlide();
-titleSlide(s, "07 — QUAND ÇA CASSE", "On a chronométré chaque panne");
+titleSlide(s, "07 — PANNES", "Comportement mesuré en cas de panne");
 const fr = [
-  [{ text: "CE QUI TOMBE", options: { bold: true } }, { text: "CE QUE VOIT LE CLIENT", options: { bold: true } }, { text: "TEMPS", options: { bold: true } }, { text: "ON INTERVIENT ?", options: { bold: true } }],
-  ["Un serveur", "Rien. Il est sorti de la rotation en 30 secondes, et les achats en cours ont le temps de se terminer.", "~30 s", "non"],
-  ["Une zone AWS entière", "Rien. Les serveurs des autres zones prennent le relais.", "quelques secondes", "non"],
-  ["La base de données", "Quelques secondes d'erreur, puis ça repart sur la machine de secours.", "1 à 2 min", "non (en prod)"],
-  ["Notre serveur d'entrée", "Rien du tout : aucun client ne passe par là.", "~2 min", "on le recrée"],
+  [{ text: "PANNE", options: { bold: true } }, { text: "CONSÉQUENCE POUR LE CLIENT", options: { bold: true } }, { text: "DURÉE", options: { bold: true } }, { text: "ACTION", options: { bold: true } }],
+  ["Un serveur", "Aucune. Retiré de la rotation après 2 vérifications échouées, les requêtes en cours ont 30 s pour finir.", "~30 s", "aucune"],
+  ["Une zone de disponibilité", "Aucune. Les serveurs des autres zones prennent le relais.", "quelques secondes", "aucune"],
+  ["La base de données", "Erreurs pendant le basculement, puis retour à la normale sur l'instance de secours.", "60 à 120 s", "aucune (prod)"],
+  ["Le bastion", "Aucune. Il ne sert qu'à l'administration.", "~2 min", "le recréer"],
 ];
 s.addTable(fr, {
-  x: MX, y: 1.75, w: CW, colW: [2.4, 6.19, 1.9, 1.6],
+  x: MX, y: 1.75, w: CW, colW: [2.6, 5.99, 1.9, 1.6],
   fontFace: B, fontSize: 12.5, color: TEXT, valign: "top",
   border: { type: "solid", pt: 0.5, color: LINE }, fill: { color: PAPER }, rowH: 0.78,
 });
-s.addShape(pres.ShapeType.roundRect, { x: MX, y: 5.35, w: CW, h: 0.95, fill: { color: "FDF4E6" }, line: { color: AMBER, width: 0.75 }, rectRadius: 0.05 });
-s.addText("Et surtout : le panier du client est conservé. Les paniers sont sur le disque partagé, pas sur le serveur qui tombe. C'est la différence entre « un serveur est tombé » et « mon panier est vide ».", {
-  x: MX + 0.28, y: 5.5, w: CW - 0.56, h: 0.7, isTextBox: true, margin: 0, fontFace: B, fontSize: 13.5, color: TEXT,
+s.addShape(pres.ShapeType.roundRect, { x: MX, y: 5.35, w: CW, h: 0.9, fill: { color: "FDF4E6" }, line: { color: AMBER, width: 0.75 }, rectRadius: 0.05 });
+s.addText("Le panier du client est conservé : les sessions PHP sont sur le disque partagé, pas sur le serveur en panne.", {
+  x: MX + 0.28, y: 5.52, w: CW - 0.56, h: 0.6, isTextBox: true, margin: 0, fontFace: B, fontSize: 14, bold: true, color: TEXT,
 });
-s.addNotes(`Troisième question : quand ça casse. On a regardé chaque panne possible, et on a chronométré.
+s.addNotes(`Troisième question : le comportement en cas de panne. Nous avons mesuré chaque cas.
 
-Un serveur tombe. Le répartiteur l'interroge toutes les quinze secondes ; au bout de deux échecs, donc trente secondes, il arrête de lui envoyer des clients. Et les achats déjà en cours ont trente secondes de plus pour se terminer. Le client ne voit rien : il est servi par les autres.
+Un serveur tombe. Le load balancer le vérifie toutes les quinze secondes. Après deux échecs, soit environ trente secondes, il le retire de la rotation. Les requêtes déjà en cours ont trente secondes supplémentaires pour se terminer. Le client ne voit rien : il est servi par les autres serveurs.
 
-Une zone AWS entière tombe — ça arrive, c'est un bâtiment entier. Les serveurs des autres zones prennent le relais. Automatique.
+Une zone de disponibilité tombe. Le load balancer a un nœud par zone, il cesse d'utiliser celui de la zone en panne. Les serveurs des autres zones prennent le relais. Aucune action de notre part.
 
-La base tombe. En production, AWS garde une machine de secours dans une autre zone. La bascule prend une à deux minutes. Il y a quelques secondes d'erreurs, on ne va pas vous mentir, puis ça repart.
+La base de données tombe. En production, elle a une instance de secours dans une autre zone. Le basculement prend entre une et deux minutes. Il y a des erreurs pendant ce temps, nous ne le cachons pas, puis le service revient.
 
-Notre serveur d'entrée tombe : aucun impact client, aucun client ne passe par là.
+Le bastion tombe. Aucune conséquence pour les clients : il ne sert qu'à l'administration. Il faut le recréer, ce qui prend deux minutes.
 
-Et le point qu'on veut vraiment que vous reteniez : le panier du client est conservé. Les paniers sont sur le disque partagé, pas sur la machine qui tombe. Pour une billetterie, c'est toute la différence.`);
+Un point important : le panier du client est conservé. Les sessions PHP sont stockées sur le disque partagé, pas sur le serveur. Si un serveur tombe, le client continue son achat sur un autre.`);
 
 // ===========================================================================
-// 9 - les bugs
+// 9 - problemes rencontres
 // ===========================================================================
 s = pres.addSlide();
-titleSlide(s, "08 — CE QU'ON A APPRIS", "Quatre problèmes vus seulement en vrai");
+titleSlide(s, "08 — PROBLÈMES RENCONTRÉS", "Quatre erreurs apparues au déploiement réel");
 const bugs = [
-  ["Un caractère interdit", "AWS refuse certains caractères dans les descriptions. On avait écrit une flèche « -> ». Création refusée."],
-  ["Un outil qui n'existe plus", "Le paquet awscli a disparu d'Ubuntu 24.04. On est passés à une bibliothèque Python : 60 Mo de moins par serveur."],
-  ["Un mot de passe exécuté", "Le mot de passe généré contenait un « & ». Le shell a cru que c'était une commande et a essayé de l'exécuter."],
-  ["Un cache incompatible", "Sur un disque partagé, PrestaShop n'arrivait pas à vider son cache. On l'a remis sur le disque local du serveur."],
+  ["Caractère refusé par AWS", "AWS n'accepte qu'un jeu de caractères limité dans les descriptions de groupes de sécurité. Le caractère « > » que nous avions utilisé faisait échouer la création."],
+  ["Paquet awscli inexistant", "Le paquet a été retiré des dépôts d'Ubuntu 24.04. Nous l'avons remplacé par la bibliothèque Python boto3, déjà disponible dans les dépôts de base."],
+  ["Mot de passe interprété", "Le script chargeait le fichier d'environnement avec « source ». Le mot de passe généré contenait un « & », que le shell a interprété comme une commande."],
+  ["Cache incompatible avec NFS", "Sur un disque réseau, supprimer un fichier ouvert laisse une trace. Le vidage de cache de PrestaShop échouait. Le cache est passé sur le disque local."],
 ];
 bugs.forEach((b, i) => {
   const x = MX + (i % 2) * 6.15;
@@ -412,33 +420,33 @@ bugs.forEach((b, i) => {
   card(s, { x, y, w: 5.9, h: 1.9 });
   bullet(s, x + 0.28, y + 0.26, String(i + 1), TEAL);
   s.addText(b[0], { x: x + 0.78, y: y + 0.24, w: 4.9, h: 0.38, isTextBox: true, margin: 0, fontFace: H, fontSize: 15, bold: true, color: TEXT });
-  s.addText(b[1], { x: x + 0.28, y: y + 0.78, w: 5.35, h: 1.0, isTextBox: true, margin: 0, fontFace: B, fontSize: 12.5, color: MUTED });
+  s.addText(b[1], { x: x + 0.28, y: y + 0.78, w: 5.35, h: 1.0, isTextBox: true, margin: 0, fontFace: B, fontSize: 12, color: MUTED });
 });
-keyLine(s, "Les quatre sont corrigés dans le dépôt : un déploiement depuis zéro ne les rencontre plus.", 6.15);
-s.addNotes(`On tenait à vous montrer cette diapo, parce que c'est la partie honnête du projet.
+keyLine(s, "Les quatre corrections sont dans le dépôt. Un déploiement depuis zéro ne les rencontre plus.", 6.15);
+s.addNotes(`Nous présentons cette diapositive parce qu'elle montre ce que le déploiement réel apporte.
 
-Le code était écrit, relu, vérifié. Et puis on l'a déployé pour de vrai sur AWS, et on s'est pris quatre murs qu'aucune relecture n'aurait montrés.
+Le code était écrit, relu et vérifié. En le déployant sur un compte AWS, nous avons rencontré quatre erreurs qu'une relecture n'aurait pas montrées.
 
-Le premier : AWS n'accepte que certains caractères dans les descriptions. On avait écrit une petite flèche, avec un chevron. Refusé.
+Première erreur : AWS n'accepte qu'un jeu de caractères limité dans les descriptions de groupes de sécurité. Nous avions écrit une flèche avec un chevron. La création du groupe a échoué.
 
-Le deuxième : l'outil en ligne de commande d'AWS n'existe plus dans les dépôts d'Ubuntu 24.04. On aurait pu installer la version officielle — soixante mégaoctets par serveur, pour un seul appel. On est passés à une bibliothèque Python déjà présente.
+Deuxième erreur : le paquet awscli n'existe plus dans les dépôts d'Ubuntu 24.04. Installer la version officielle représentait soixante mégaoctets par serveur pour un seul appel. Nous l'avons remplacé par la bibliothèque Python boto3, déjà disponible.
 
-Le troisième, c'est notre préféré. Le mot de passe de la base est généré au hasard, et il contenait une esperluette, le « et commercial ». Notre script chargeait le fichier avec une commande du shell — et le shell a pris le mot de passe pour une commande, et a essayé de l'exécuter. Maintenant on lit le fichier sans jamais l'interpréter, et on a limité les caractères du mot de passe.
+Troisième erreur : notre script chargeait le fichier de configuration avec la commande source du shell. Le mot de passe de la base, généré aléatoirement, contenait une esperluette. Le shell l'a interprétée comme un séparateur de commande. Nous lisons maintenant ce fichier sans l'interpréter, et nous avons restreint les caractères du mot de passe généré.
 
-Le quatrième : PrestaShop vide son cache après l'installation. Sur un disque partagé en réseau, supprimer un fichier encore ouvert laisse une trace invisible, donc la suppression échouait — et ça tuait le conteneur juste après une installation réussie. On a compris que ce cache n'avait rien à faire sur le disque partagé : c'est un fichier temporaire, propre à chaque serveur. On l'a remis en local.
+Quatrième erreur : sur un disque réseau, supprimer un fichier encore ouvert laisse une entrée temporaire. Le vidage de cache de PrestaShop échouait donc après l'installation, et arrêtait le conteneur. Nous avons déplacé ce cache sur le disque local de chaque serveur, puisqu'il est propre à chaque serveur et régénérable.
 
-Les quatre sont corrigés dans le dépôt. Un déploiement depuis zéro ne les rencontre plus.`);
+Les quatre corrections sont dans le dépôt.`);
 
 // ===========================================================================
 // 10 - limites
 // ===========================================================================
 s = pres.addSlide();
-titleSlide(s, "09 — CE QU'ON N'A PAS FAIT", "Nos limites, et comment on les franchirait");
+titleSlide(s, "09 — LIMITES", "Limites de la solution");
 const lims = [
-  ["Ajouter des serveurs demande quelqu'un", "Ce n'est pas automatique : il faut un opérateur et deux commandes, environ 3 minutes. Pour l'automatiser, il faudrait préparer une image toute faite du serveur. Notre installation est déjà écrite pour ça."],
-  ["Tout le site est sur le disque partagé", "C'est pratique — les serveurs sont interchangeables — mais un disque réseau est plus lent qu'un disque local. Au-delà de quelques milliers de visiteurs par minute, il faudrait mettre le site dans l'image et ne partager que les photos."],
-  ["Une seule base pour écrire", "On peut ajouter des copies pour la lecture, mais pas pour l'écriture. Et une billetterie, ça écrit beaucoup. C'est la taille de cette base qui est notre vrai plafond."],
-  ["Une seule région", "Si toute la région Paris tombe, la boutique tombe. Doubler dans une autre région coûterait plus cher que la panne qu'on évite. C'est un choix, pas un oubli."],
+  ["La montée en charge n'est pas automatique", "Elle demande un opérateur et deux commandes, environ 3 minutes. Pour l'automatiser, il faudrait construire une image serveur préconfigurée avec Packer et utiliser un groupe d'autoscaling."],
+  ["Le site entier est sur le disque partagé", "Cela rend les serveurs interchangeables, mais un disque réseau est plus lent qu'un disque local. Au-delà de quelques milliers de requêtes par minute, il faudrait mettre le code dans l'image et ne partager que les images produits."],
+  ["Une seule base en écriture", "Les lectures peuvent être réparties sur des réplicas, pas les écritures. Une billetterie écrit beaucoup : la taille de l'instance principale est la limite."],
+  ["Une seule région", "Une panne régionale interrompt le service. Le multi-région coûterait plus que la panne qu'il évite à cette échelle."],
 ];
 lims.forEach((l, i) => {
   const x = MX + (i % 2) * 6.15;
@@ -447,26 +455,26 @@ lims.forEach((l, i) => {
   s.addText(l[0], { x: x + 0.28, y: y + 0.18, w: 5.35, h: 0.62, isTextBox: true, margin: 0, fontFace: H, fontSize: 14, bold: true, color: TEXT });
   s.addText(l[1], { x: x + 0.28, y: y + 0.82, w: 5.35, h: 1.05, isTextBox: true, margin: 0, fontFace: B, fontSize: 11.5, color: MUTED });
 });
-s.addNotes(`Une infrastructure dont on ne connaît pas les limites, c'est une infrastructure qu'on n'a pas comprise. Voilà les nôtres, en toute transparence.
+s.addNotes(`Voici les limites de notre solution.
 
-La première, la plus importante : ajouter des serveurs, ça demande quelqu'un. Ce n'est pas automatique. Un pic soudain, il faut un opérateur et deux commandes — trois minutes. Pour l'automatiser vraiment, il faudrait préparer à l'avance une image toute faite du serveur, avec tout déjà installé. Et bonne nouvelle : notre installation est déjà écrite pour ça, c'est une évolution, pas une réécriture.
+Première limite, la principale : la montée en charge n'est pas automatique. Elle demande un opérateur et deux commandes, environ trois minutes. Pour l'automatiser, il faudrait construire à l'avance une image serveur préconfigurée, avec Packer, puis utiliser un groupe d'autoscaling derrière le même load balancer. Notre rôle Ansible et notre page de santé sont déjà compatibles avec cette évolution.
 
-La deuxième : on a mis tout le site sur le disque partagé. C'est ce qui rend les serveurs interchangeables, mais un disque réseau est plus lent qu'un disque local. Au-delà de quelques milliers de visiteurs par minute, il faudrait mettre le site dans l'image et ne garder que les photos sur le disque partagé.
+Deuxième limite : le site entier est sur le disque partagé. Cela rend les serveurs interchangeables, mais un disque réseau est plus lent qu'un disque local pour lire des fichiers PHP. Au-delà de quelques milliers de requêtes par minute, il faudrait mettre le code dans l'image Docker et ne partager que les images produits.
 
-La troisième : une seule base pour écrire. On peut ajouter des copies pour la lecture, mais une billetterie, ça écrit surtout.
+Troisième limite : une seule base en écriture. On peut répartir les lectures sur des réplicas, pas les écritures. Une billetterie écrit beaucoup, donc la taille de l'instance principale est notre plafond.
 
-Et la quatrième : une seule région. Si toute la région Paris tombe, on tombe. Doubler ailleurs coûterait plus cher que la panne qu'on évite. C'est assumé.`);
+Quatrième limite : une seule région. Une panne régionale interrompt le service. À cette échelle, le multi-région coûterait plus cher que la panne qu'il évite. C'est un choix, pas un oubli.`);
 
 // ===========================================================================
 // 11 - demo
 // ===========================================================================
 s = pres.addSlide();
-titleSlide(s, "10 — DÉMONSTRATION", "D'un compte AWS vide à une boutique en ligne");
+titleSlide(s, "10 — DÉMONSTRATION", "Déploiement complet en six commandes");
 code(s, [
-  "./scripts/bootstrap-backend.sh dev     # une seule fois par compte",
+  "./scripts/bootstrap-backend.sh dev     # une fois par compte AWS",
   "",
   "terraform -chdir=terraform init",
-  "terraform -chdir=terraform apply       # ~12 min (la base est lente)",
+  "terraform -chdir=terraform apply       # ~12 min (création RDS)",
   "",
   "ansible-galaxy install -r ansible/requirements.yml",
   "ansible-inventory -i ansible/inventory.yml --graph",
@@ -474,10 +482,10 @@ code(s, [
 ], { x: MX, y: 1.75, w: 7.3, h: 2.9, size: 11.5, dark: true });
 
 const steps = [
-  "La boutique, puis l'administration",
-  "On relance l'installation : changed=0",
-  "On ajoute un serveur, il entre tout seul",
-  "On en coupe un : la boutique tient",
+  "La boutique et le back-office",
+  "Playbook relancé : changed=0",
+  "Ajout d'un serveur",
+  "Arrêt d'un serveur : le site répond",
 ];
 steps.forEach((t, i) => {
   const y = 1.85 + i * 0.78;
@@ -485,18 +493,18 @@ steps.forEach((t, i) => {
   s.addText(t, { x: 8.72, y: y - 0.02, w: 4.1, h: 0.45, isTextBox: true, margin: 0, fontFace: B, fontSize: 13.5, color: TEXT, valign: "middle" });
 });
 s.addShape(pres.ShapeType.roundRect, { x: MX, y: 4.95, w: 7.3, h: 0.85, fill: { color: WASH }, line: { color: LINE, width: 0.75 }, rectRadius: 0.05 });
-s.addText("Tout le reste — réseau, base, disque, surveillance, mots de passe — découle de ces six commandes.", {
-  x: MX + 0.25, y: 5.1, w: 6.8, h: 0.6, isTextBox: true, margin: 0, fontFace: B, fontSize: 12.5, color: MUTED,
+s.addText("Réseau, base, stockage, surveillance et secrets sont créés par ces commandes.", {
+  x: MX + 0.25, y: 5.15, w: 6.8, h: 0.5, isTextBox: true, margin: 0, fontFace: B, fontSize: 12.5, color: MUTED,
 });
-s.addNotes(`Voilà tout ce qu'il y a à taper. Six commandes.
+s.addNotes(`Voici l'ensemble des commandes nécessaires.
 
-La première, on ne la lance qu'une fois par compte : elle prépare l'endroit où Terraform range sa description de l'infrastructure.
+La première ne se lance qu'une fois par compte AWS : elle crée le bucket S3 qui stocke l'état Terraform.
 
-Ensuite Terraform construit. Une douzaine de minutes, et c'est la base de données qui prend tout le temps.
+Ensuite, Terraform : init puis apply. L'opération prend une douzaine de minutes, dont la majorité pour la création de la base de données.
 
-Puis Ansible installe. Regardez bien la commande du milieu : c'est celle qui affiche la liste des serveurs. Aucune adresse n'y est écrite, elle est lue chez Terraform.
+Puis Ansible : on installe les dépendances depuis Galaxy, on vérifie l'inventaire, et on lance le playbook. La commande du milieu affiche la liste des serveurs : aucune adresse n'y est écrite, elle vient de l'état Terraform.
 
-On va vous montrer quatre choses : la boutique et son administration ; l'installation relancée qui ne change rien ; un serveur ajouté qui entre tout seul en service ; et enfin on en coupe un, en direct, pour vous montrer que la boutique tient.`);
+Nous allons vous montrer quatre choses : la boutique et son back-office, le playbook relancé qui n'affiche aucune modification, l'ajout d'un serveur, et enfin l'arrêt d'un serveur pour montrer que le site continue de répondre.`);
 
 // ===========================================================================
 // 12 - fin
@@ -504,17 +512,17 @@ On va vous montrer quatre choses : la boutique et son administration ; l'install
 s = pres.addSlide();
 s.background = { color: INK };
 s.addShape(pres.ShapeType.ellipse, { x: MX, y: 1.72, w: 0.16, h: 0.16, fill: { color: AMBER }, line: { color: AMBER } });
-s.addText("MERCI — VOS QUESTIONS", {
+s.addText("CONCLUSION", {
   x: MX + 0.3, y: 1.65, w: CW, h: 0.3, isTextBox: true, margin: 0, fontFace: M, fontSize: 12, color: AMBER, charSpacing: 2,
 });
-s.addText("En ligne, documentée,\net on sait la refaire.", {
+s.addText("Déployée, documentée,\nreproductible.", {
   x: MX, y: 2.15, w: 11.0, h: 1.7, isTextBox: true, margin: 0,
   fontFace: H, fontSize: 42, bold: true, color: PAPER, lineSpacing: 46,
 });
 const finals = [
-  ["Terraform", "6 briques · 3 environnements"],
-  ["Ansible", "3 rôles · secrets chiffrés · changed=0"],
-  ["README", "installer, exploiter, dépanner"],
+  ["Terraform", "6 modules · 3 environnements · état distant"],
+  ["Ansible", "3 rôles · Galaxy · Vault · changed=0"],
+  ["README", "déployer, exploiter, dépanner"],
 ];
 finals.forEach((f, i) => {
   const x = MX + i * 4.12;
@@ -522,23 +530,23 @@ finals.forEach((f, i) => {
   s.addText(f[0], { x: x + 0.25, y: 4.35, w: 3.4, h: 0.3, isTextBox: true, margin: 0, fontFace: M, fontSize: 13, bold: true, color: AMBER });
   s.addText(f[1], { x: x + 0.25, y: 4.68, w: 3.4, h: 0.5, isTextBox: true, margin: 0, fontFace: B, fontSize: 11.5, color: "A8B8C8" });
 });
-s.addText("5HASH  —  merci de votre attention", {
+s.addText("Merci de votre attention. Nous répondons à vos questions.", {
   x: MX, y: 5.75, w: CW, h: 0.4, isTextBox: true, margin: 0, fontFace: H, fontSize: 17, bold: true, color: PAPER,
 });
-s.addNotes(`Pour conclure. La boutique est en ligne sur un vrai compte AWS. Elle est documentée : le README explique comment l'installer, la faire grandir, la dépanner et la supprimer. Et on sait la refaire : on l'a détruite et redéployée pour en être sûrs.
+s.addNotes(`Pour conclure. La boutique est déployée sur un compte AWS réel. Elle est documentée : le README explique comment la déployer, l'exploiter, la mettre à l'échelle, la dépanner et la supprimer. Et elle est reproductible : nous l'avons détruite et redéployée pour le vérifier.
 
-Merci de votre attention, on est prêts pour vos questions.
+Merci de votre attention, nous répondons à vos questions.
 
-[Réponses courtes à avoir en tête :
+[Réponses préparées :
 
-— Pourquoi pas d'ajout automatique de serveurs ? Parce qu'on installe les serveurs avec Ansible après leur création. Pour automatiser, il faudrait une image toute prête. On a préféré livrer quelque chose qui marche et dont on connaît la limite.
+— Pourquoi pas d'autoscaling ? Parce que nos serveurs sont configurés par Ansible après leur création. Un groupe d'autoscaling lancerait des machines non configurées. Il faudrait d'abord construire une image préconfigurée avec Packer.
 
-— Pourquoi EFS et pas S3 ? Parce que PrestaShop écrit sur un disque, tout simplement. S3 demanderait un module en plus.
+— Pourquoi EFS et pas S3 ? Parce que PrestaShop écrit sur un système de fichiers. Utiliser S3 demanderait un module PrestaShop supplémentaire.
 
-— Où est le mot de passe de la base ? Nulle part chez nous. AWS le garde, et chaque serveur va le chercher avec sa propre autorisation.
+— Où est le mot de passe de la base ? Dans AWS Secrets Manager. Terraform le génère, chaque serveur le lit avec son rôle IAM. Il n'est ni dans le dépôt, ni dans l'inventaire Ansible.
 
-— Combien ça coûte ? Deux à trois dollars par jour pour l'environnement de test.
+— Combien ça coûte ? Environ deux à trois dollars par jour pour l'environnement dev. Les postes principaux sont la passerelle NAT et le load balancer.
 
-— Comment vous changez de version de PrestaShop ? Une ligne dans un fichier Ansible, on relance, et on prend une sauvegarde de la base avant.]`);
+— Comment changer de version de PrestaShop ? C'est une variable dans les group_vars Ansible. On modifie le tag de l'image et on relance le playbook, après une sauvegarde de la base.]`);
 
 pres.writeFile({ fileName: process.argv[2] || "soutenance.pptx" }).then((f) => console.log("écrit :", f));
