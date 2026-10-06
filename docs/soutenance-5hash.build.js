@@ -80,37 +80,37 @@ function keyLine(slide, text, y) {
 // 1 - titre
 // ===========================================================================
 let s = pres.addSlide();
-s.background = { color: INK };
+s.background = { color: PAPER };
 s.addShape(pres.ShapeType.ellipse, { x: MX, y: 1.5, w: 0.16, h: 0.16, fill: { color: AMBER }, line: { color: AMBER } });
 s.addText("PROJET 5HASH  ·  INFRASTRUCTURE AS CODE", {
   x: MX + 0.3, y: 1.43, w: CW, h: 0.3, isTextBox: true, margin: 0,
-  fontFace: M, fontSize: 12, color: AMBER, charSpacing: 2,
+  fontFace: M, fontSize: 12, color: AMBER_DK, charSpacing: 2,
 });
 s.addText("Taylor Shift", {
   x: MX, y: 1.95, w: CW, h: 1.1, isTextBox: true, margin: 0,
-  fontFace: H, fontSize: 56, bold: true, color: PAPER,
+  fontFace: H, fontSize: 56, bold: true, color: TEXT,
 });
 s.addText("Infrastructure de la boutique de billets", {
   x: MX, y: 3.08, w: 9.6, h: 0.5, isTextBox: true, margin: 0,
-  fontFace: B, fontSize: 21, color: "A8B8C8",
+  fontFace: B, fontSize: 21, color: MUTED,
 });
 const chips = ["Terraform", "Ansible", "PrestaShop", "AWS"];
 chips.forEach((c, i) => {
   const x = MX + i * 2.0;
   s.addShape(pres.ShapeType.roundRect, {
-    x, y: 3.9, w: 1.8, h: 0.45, fill: { color: INK_SOFT }, line: { color: "35475A", width: 0.75 }, rectRadius: 0.08,
+    x, y: 3.9, w: 1.8, h: 0.45, fill: { color: WASH }, line: { color: LINE, width: 0.75 }, rectRadius: 0.08,
   });
-  s.addText(c, { x, y: 3.9, w: 1.8, h: 0.45, isTextBox: true, margin: 0, fontFace: M, fontSize: 12, color: "C9D6E2", align: "center", valign: "middle" });
+  s.addText(c, { x, y: 3.9, w: 1.8, h: 0.45, isTextBox: true, margin: 0, fontFace: M, fontSize: 12, color: TEXT, align: "center", valign: "middle" });
 });
 s.addText("Prénom 1  ·  Prénom 2  ·  Prénom 3", {
-  x: MX, y: 4.85, w: CW, h: 0.35, isTextBox: true, margin: 0, fontFace: B, fontSize: 16, color: PAPER,
+  x: MX, y: 4.85, w: CW, h: 0.35, isTextBox: true, margin: 0, fontFace: B, fontSize: 16, color: TEXT,
 });
 s.addText("Déployé sur un compte AWS, région eu-west-3 (Paris)", {
-  x: MX, y: 5.25, w: CW, h: 0.3, isTextBox: true, margin: 0, fontFace: B, fontSize: 13, color: "7A8C9E",
+  x: MX, y: 5.25, w: CW, h: 0.3, isTextBox: true, margin: 0, fontFace: B, fontSize: 13, color: MUTED,
 });
-s.addShape(pres.ShapeType.roundRect, { x: MX, y: 5.9, w: 7.6, h: 0.62, fill: { color: INK_SOFT }, line: { color: "35475A", width: 0.75 }, rectRadius: 0.06 });
+s.addShape(pres.ShapeType.roundRect, { x: MX, y: 5.9, w: 7.6, h: 0.62, fill: { color: WASH }, line: { color: LINE, width: 0.75 }, rectRadius: 0.06 });
 s.addText("4 diapositives  ·  5 min      Démonstration  ·  7 min      Questions", {
-  x: MX + 0.28, y: 5.9, w: 7.1, h: 0.62, isTextBox: true, margin: 0, fontFace: M, fontSize: 12.5, color: "C9D6E2", valign: "middle",
+  x: MX + 0.28, y: 5.9, w: 7.1, h: 0.62, isTextBox: true, margin: 0, fontFace: M, fontSize: 12.5, color: TEXT, valign: "middle",
 });
 s.addNotes(`Bonjour. Nous sommes l'agence 5HASH. Taylor Shift nous a confié l'infrastructure de sa boutique de billets.
 
@@ -325,14 +325,14 @@ Une précision : l'infrastructure a été créée avant la soutenance. La créat
 // 6 - bilan et questions
 // ===========================================================================
 s = pres.addSlide();
-s.background = { color: INK };
+s.background = { color: PAPER };
 s.addShape(pres.ShapeType.ellipse, { x: MX, y: 0.95, w: 0.16, h: 0.16, fill: { color: AMBER }, line: { color: AMBER } });
 s.addText("BILAN", {
-  x: MX + 0.3, y: 0.88, w: CW, h: 0.3, isTextBox: true, margin: 0, fontFace: M, fontSize: 12, color: AMBER, charSpacing: 2,
+  x: MX + 0.3, y: 0.88, w: CW, h: 0.3, isTextBox: true, margin: 0, fontFace: M, fontSize: 12, color: AMBER_DK, charSpacing: 2,
 });
 s.addText("Déployée, documentée, reproductible.", {
   x: MX, y: 1.35, w: 11.6, h: 0.75, isTextBox: true, margin: 0,
-  fontFace: H, fontSize: 34, bold: true, color: PAPER,
+  fontFace: H, fontSize: 34, bold: true, color: TEXT,
 });
 
 const panels = [
@@ -346,7 +346,7 @@ const panels = [
     ],
   },
   {
-    title: "CORRIGÉ AU DÉPLOIEMENT RÉEL", color: AMBER,
+    title: "CORRIGÉ AU DÉPLOIEMENT RÉEL", color: AMBER_DK,
     items: [
       "Une description de pare-feu refusée par AWS",
       "Un paquet absent des dépôts d'Ubuntu 24.04",
@@ -355,7 +355,7 @@ const panels = [
     ],
   },
   {
-    title: "CE QU'ON N'A PAS FAIT", color: "8FA3B5",
+    title: "CE QU'ON N'A PAS FAIT", color: MUTED,
     items: [
       "Pas d'auto-scaling : choix assumé, expliqué",
       "HTTPS prêt dans le code, pas activé en dev",
@@ -366,18 +366,18 @@ const panels = [
 ];
 panels.forEach((p, i) => {
   const x = MX + i * 4.12;
-  s.addShape(pres.ShapeType.roundRect, { x, y: 2.35, w: 3.85, h: 3.35, fill: { color: INK_SOFT }, line: { color: "35475A", width: 0.75 }, rectRadius: 0.06 });
+  s.addShape(pres.ShapeType.roundRect, { x, y: 2.35, w: 3.85, h: 3.35, fill: { color: PAPER }, line: { color: LINE, width: 0.75 }, rectRadius: 0.06 });
   s.addShape(pres.ShapeType.line, { x: x + 0.25, y: 2.63, w: 0.42, h: 0, line: { color: p.color, width: 2 } });
   s.addText(p.title, { x: x + 0.25, y: 2.75, w: 3.4, h: 0.42, isTextBox: true, margin: 0, fontFace: M, fontSize: 10, bold: true, color: p.color, charSpacing: 0.5 });
   p.items.forEach((it, j) => {
-    s.addText("·  " + it, { x: x + 0.25, y: 3.28 + j * 0.58, w: 3.42, h: 0.52, isTextBox: true, margin: 0, fontFace: B, fontSize: 10.5, color: "C9D6E2" });
+    s.addText("·  " + it, { x: x + 0.25, y: 3.28 + j * 0.58, w: 3.42, h: 0.52, isTextBox: true, margin: 0, fontFace: B, fontSize: 10.5, color: TEXT });
   });
 });
 s.addText("Merci de votre attention. Nous répondons à vos questions.", {
-  x: MX, y: 6.05, w: CW, h: 0.4, isTextBox: true, margin: 0, fontFace: H, fontSize: 18, bold: true, color: PAPER,
+  x: MX, y: 6.05, w: CW, h: 0.4, isTextBox: true, margin: 0, fontFace: H, fontSize: 18, bold: true, color: TEXT,
 });
 s.addText("Les trois colonnes ci-dessus sont volontairement affichées pendant les questions : elles indiquent ce que nous savons défendre.", {
-  x: MX, y: 6.5, w: CW, h: 0.35, isTextBox: true, margin: 0, fontFace: B, fontSize: 12, color: "7A8C9E",
+  x: MX, y: 6.5, w: CW, h: 0.35, isTextBox: true, margin: 0, fontFace: B, fontSize: 12, color: MUTED,
 });
 s.addNotes(`Pour conclure.
 
