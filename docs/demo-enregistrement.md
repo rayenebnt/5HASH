@@ -150,10 +150,10 @@ terraform -chdir=terraform output database_endpoint
 > sous-réseau privé des données, joignable uniquement depuis les serveurs
 > applicatifs. »
 
-Passez au back-office. **Catalogue → Produits**, ouvrez un billet, changez son
+Passez au back-office. **Catalogue → Produits**, ouvrez un produit, changez son
 prix, enregistrez.
 
-Revenez sur l'onglet de la boutique, ouvrez la fiche du billet et rechargez
+Revenez sur l'onglet de la boutique, ouvrez la fiche du produit et rechargez
 avec `Ctrl + Maj + R`.
 
 > « Le nouveau prix s'affiche. L'écriture est partie du back-office, elle est
@@ -167,9 +167,6 @@ avec `Ctrl + Maj + R`.
 > besoin de cette étape.
 
 Remettez le prix d'origine après la prise.
-
-> Le catalogue affiché est celui de la billetterie : il est monté par Ansible
-> (`prestashop_seed_catalogue`), donc un redéploiement complet le reproduit.
 
 ---
 
