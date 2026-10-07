@@ -266,7 +266,7 @@ ansible-playbook -i ansible/inventory.yml ansible/site.yml --ask-vault-pass
 
 ```
 bootstrap/              S3 + DynamoDB backend for the Terraform state (run once)
-scripts/                bootstrap-backend.sh, destroy.sh
+scripts/                bootstrap-backend.sh, destroy.sh, demo-check.sh
 terraform/
   main.tf               composition of the six modules
   locals.tf             per-environment sizing (dev / staging / prod)

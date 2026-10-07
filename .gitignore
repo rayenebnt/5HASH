@@ -36,3 +36,10 @@ vault-password*
 *~
 .idea/
 .vscode/
+
+# --- Enregistrements de la démonstration -----------------------------------
+# La vidéo de secours de la soutenance ne va pas dans le dépôt (poids).
+*.mp4
+*.mkv
+*.mov
+*.webm
