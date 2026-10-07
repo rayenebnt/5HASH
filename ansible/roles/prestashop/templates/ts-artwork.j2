@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# {{ ansible_managed }}
+#
+# Replaces a product picture with a file shipped by the role.
+#
+#   ts-artwork <product id> <file.jpg>
+#
+# PrestaShop stores pictures under img/p/ in a split path: one directory per
+# digit of the image id (image 123 -> img/p/1/2/3/123.jpg), with one file per
+# format (123-home_default.jpg, 123-large_default.jpg...). Overwriting the
+# files already declared in the database avoids inserting image rows, so there
+# is nothing to undo.
+
+set -euo pipefail
+
+ENV_FILE="{{ prestashop_config_dir }}/db.env"
+IMG_ROOT="{{ prestashop_html_dir }}/img/p"
+
+id_product="${1:?usage: ts-artwork <product id> <file.jpg>}"
+source_file="${2:?usage: ts-artwork <product id> <file.jpg>}"
+
+# Never interpolated into SQL unchecked.
+if ! printf '%s' "${id_product}" | grep -Eq '^[0-9]+$'; then
+  echo "invalid product id: ${id_product}" >&2
+  exit 2
+fi
+[ -r "${source_file}" ] || { echo "unreadable file: ${source_file}" >&2; exit 1; }
+
+read_env() {
+  sed -n "s/^$1=//p" "${ENV_FILE}" | head -1
+}
+
+MYSQL_PWD="$(read_env DB_PASSWD)"
+export MYSQL_PWD
+
+id_image="$(mysql --host="$(read_env DB_SERVER)" --port="$(read_env DB_PORT)" \
+                  --user="$(read_env DB_USER)" --database="$(read_env DB_NAME)" \
+                  --batch --skip-column-names --connect-timeout=10 \
+            -e "SELECT id_image FROM $(read_env DB_PREFIX)image
+                 WHERE id_product = ${id_product}
+                 ORDER BY position, id_image LIMIT 1")"
+
+# A product without a picture keeps the default one: not an error, the
+# catalogue is already correct without it.
+if [ -z "${id_image}" ]; then
+  echo "noimage"
+  exit 0
+fi
+
+dir="${IMG_ROOT}"
+for digit in $(printf '%s' "${id_image}" | grep -o .); do
+  dir="${dir}/${digit}"
+done
+
+if [ ! -d "${dir}" ]; then
+  echo "nodir"
+  exit 0
+fi
+
+# Already in place: rewriting it would make the playbook never settle.
+if [ -f "${dir}/${id_image}.jpg" ] && cmp -s "${source_file}" "${dir}/${id_image}.jpg"; then
+  echo "uptodate"
+  exit 0
+fi
+
+# Every format of the same picture. `cp` writes into the existing file, so
+# ownership and permissions are preserved.
+found=0
+while IFS= read -r target; do
+  cp -f "${source_file}" "${target}"
+  found=1
+done < <(find "${dir}" -maxdepth 1 -type f \
+              \( -name "${id_image}.jpg" -o -name "${id_image}-*.jpg" \))
+
+if [ "${found}" -eq 0 ]; then
+  echo "nofile"
+  exit 0
+fi
+
+echo "changed"

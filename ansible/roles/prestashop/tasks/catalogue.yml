@@ -1,0 +1,65 @@
+---
+# The brief asks for a ticket shop; the generic image installs PrestaShop's
+# demo fixtures. These tasks turn the demo catalogue into Taylor Shift's
+# billetterie, so that destroying and redeploying the stack gives back the
+# ticket shop and not "my store".
+#
+# Everything here converges: the SQL is replayed only when its content changes,
+# and a picture is written only when it differs from the one already in place.
+
+- name: Install the catalogue definition
+  ansible.builtin.template:
+    src: ts-catalogue.sql.j2
+    dest: "{{ prestashop_config_dir }}/catalogue.sql"
+    owner: root
+    group: root
+    mode: "0640"
+
+- name: Install the catalogue helper
+  ansible.builtin.template:
+    src: ts-catalogue.j2
+    dest: /usr/local/bin/ts-catalogue
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Install the artwork helper
+  ansible.builtin.template:
+    src: ts-artwork.j2
+    dest: /usr/local/bin/ts-artwork
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Publish the ticket artwork on the instance
+  ansible.builtin.copy:
+    src: billetterie/
+    dest: "{{ prestashop_config_dir }}/billetterie/"
+    owner: root
+    group: root
+    mode: "0644"
+
+# One shop, one database: a single host applies it and the others would only
+# replay the same statements.
+- name: Apply the catalogue to the shop database
+  ansible.builtin.command:
+    cmd: /usr/local/bin/ts-catalogue
+  register: prestashop_catalogue
+  # Exact match: the script answers "changed" or "uptodate".
+  changed_when: (prestashop_catalogue.stdout | default('') | trim) == "changed"
+  run_once: true
+  notify: Clear the PrestaShop cache
+
+# The document root is shared, so the pictures are written once as well. The
+# helper answers "uptodate", "changed", or "noimage"/"nodir"/"nofile" when the
+# demo fixture has no picture for that product.
+- name: Put the ticket artwork on the products
+  ansible.builtin.command:
+    cmd: "/usr/local/bin/ts-artwork {{ item.id }} {{ prestashop_config_dir }}/billetterie/{{ item.image }}"
+  register: prestashop_artwork
+  changed_when: (prestashop_artwork.stdout | default('') | trim) == "changed"
+  loop: "{{ prestashop_catalogue_products }}"
+  loop_control:
+    label: "{{ item.name }}"
+  run_once: true
+  notify: Clear the PrestaShop cache

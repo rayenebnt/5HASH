@@ -218,13 +218,13 @@ terraform -chdir=terraform output database_endpoint
 > applicatifs. »
 
 Passez au back-office (onglet déjà connecté), **Catalogue → Produits**, ouvrez
-un produit, changez son prix, enregistrez. Revenez sur l'onglet de la boutique
+un billet, changez son prix, enregistrez. Revenez sur l'onglet de la boutique
 et rechargez.
 
-> « Le nouveau prix s'affiche. L'écriture est partie du back-office, elle est
-> passée par la base, et elle revient côté client. **Une page qui s'affiche ne
-> prouverait pas que la base fonctionne ; un aller-retour comme celui-ci,
-> oui.** »
+> « Le nouveau prix du billet s'affiche. L'écriture est partie du back-office,
+> elle est passée par la base, et elle revient côté client. **Une page qui
+> s'affiche ne prouverait pas que la base fonctionne ; un aller-retour comme
+> celui-ci, oui.** »
 
 ## Étape 3 — Les serveurs viennent de Terraform · 1 min
 

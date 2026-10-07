@@ -223,6 +223,13 @@ Other decisions worth knowing:
 - The shop URL stored in the database is **reconciled on every run** with the
   current load balancer name, which is what makes the stack redeployable from
   scratch.
+- The generic image installs PrestaShop's **demo fixtures** ("my store",
+  clothes, lorem ipsum). The brief asks for a ticket shop, so the role turns
+  them into one: shop name, categories, the nine ticket and pass references
+  with their prices and artwork, and the demo home-page modules unhooked.
+  Reusing the demo rows rather than inserting products keeps it safe — a
+  different fixture can leave a label behind, it cannot break the shop. Set
+  `prestashop_seed_catalogue: false` to keep the demo shop as-is.
 
 ---
 

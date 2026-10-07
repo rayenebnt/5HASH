@@ -1,0 +1,87 @@
+-- {{ ansible_managed }}
+--
+-- Taylor Shift ticket shop catalogue.
+--
+-- The generic Docker image installs PrestaShop with its demo fixtures
+-- ("my store", clothes, lorem ipsum). This file turns them into the ticket
+-- shop the brief asks for. It is applied by /usr/local/bin/ts-catalogue, which
+-- replays it only when its content changes, so a second playbook run reports
+-- nothing.
+--
+-- Only UPDATEs, targeted DELETEs and INSERT IGNORE on category links: no
+-- product row is created, so a different demo fixture can leave an original
+-- label behind but cannot break the shop.
+{% set p = prestashop_db_prefix %}
+SET NAMES utf8mb4;
+START TRANSACTION;
+
+-- --- Shop identity --------------------------------------------------------
+UPDATE {{ p }}shop
+   SET name = '{{ prestashop_shop_name | replace("'", "''") }}'
+ WHERE id_shop = 1;
+
+UPDATE {{ p }}configuration
+   SET value = '{{ prestashop_shop_name | replace("'", "''") }}'
+ WHERE name = 'PS_SHOP_NAME';
+
+-- The browser tab of the home page reads its title here, which is why the
+-- untouched shop announces itself as "PrestaShop".
+UPDATE {{ p }}meta_lang ml
+  JOIN {{ p }}meta m ON m.id_meta = ml.id_meta
+   SET ml.title       = '{{ prestashop_catalogue_shop_title | replace("'", "''") }}',
+       ml.description = '{{ prestashop_catalogue_shop_tagline | replace("'", "''") }}'
+ WHERE m.page = 'index';
+
+-- --- Categories -----------------------------------------------------------
+{% for c in prestashop_catalogue_categories %}
+UPDATE {{ p }}category_lang
+   SET name         = '{{ c.name | replace("'", "''") }}',
+       link_rewrite = '{{ c.rewrite }}'
+ WHERE id_category = {{ c.id }};
+{% endfor %}
+
+-- --- Products -------------------------------------------------------------
+{% for item in prestashop_catalogue_products %}
+UPDATE {{ p }}product
+   SET price = {{ '%.6f' | format(item.price) }},
+       id_category_default = {{ item.category }},
+       active = 1
+ WHERE id_product = {{ item.id }};
+
+UPDATE {{ p }}product_shop
+   SET price = {{ '%.6f' | format(item.price) }},
+       id_category_default = {{ item.category }},
+       active = 1
+ WHERE id_product = {{ item.id }};
+
+UPDATE {{ p }}product_lang
+   SET name              = '{{ item.name | replace("'", "''") }}',
+       link_rewrite      = '{{ item.rewrite }}',
+       description_short = '<p>{{ item.summary | replace("'", "''") }}</p>',
+       description       = '<p>{{ item.summary | replace("'", "''") }}</p>'
+ WHERE id_product = {{ item.id }};
+
+-- The product now belongs to the home page and to its own category only.
+DELETE FROM {{ p }}category_product WHERE id_product = {{ item.id }};
+INSERT IGNORE INTO {{ p }}category_product (id_category, id_product, position)
+VALUES (2, {{ item.id }}, 0), ({{ item.category }}, {{ item.id }}, 0);
+
+-- The demo "-20%" badges make no sense on a ticket.
+DELETE FROM {{ p }}specific_price WHERE id_product = {{ item.id }};
+
+UPDATE {{ p }}stock_available
+   SET quantity = {{ prestashop_catalogue_stock }}
+ WHERE id_product = {{ item.id }};
+{% endfor %}
+
+-- --- Demo content on the home page ----------------------------------------
+-- The "SAMPLE 1" carousel, the "20% OFF ON CLOTHES" banner and the lorem
+-- ipsum block are modules: unhooking them is reversible and leaves their code
+-- installed, unlike rewriting their content.
+DELETE FROM {{ p }}hook_module
+ WHERE id_module IN (
+   SELECT id_module FROM {{ p }}module
+    WHERE name IN ({% for m in prestashop_catalogue_disabled_modules %}'{{ m }}'{{ ", " if not loop.last }}{% endfor %})
+ );
+
+COMMIT;
